@@ -17,6 +17,7 @@ Collections can also have a default sorting by specifying the sort columns in th
   <order by="binding2" sort="ascending" />
 </ordering>
 ```
+**[⬆ back to top](#contents)**
 
 ### Troubleshooting
 
@@ -48,3 +49,4 @@ Caused by: java.lang.OutOfMemoryError: Java heap space
     at org.skyve.impl.util.UtilImpl.readJSONConfig(UtilImpl.java:197)
     at org.skyve.impl.web.SkyveContextListener.contextInitialized(SkyveContextListener.java:60)
 ```
+**[⬆ back to top](#contents)**
