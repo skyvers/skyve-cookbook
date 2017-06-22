@@ -2,10 +2,30 @@
 Examples and code samples for using the [Skyve](http://skyve.org/) framework.
 
 ### Contents
-
+* [Deproxy](#deproxy)
 * [Ordering a collection in a data table](#ordering-a-collection-in-a-data-table)
 * [Troubleshooting](#troubleshooting)
   * [Heap space errors](heap-space-errors)
+
+### Deproxy 
+When to use:
+- performing an `instanceof` fails when operating over subclasses of a document with a persistence strategy of single
+- Skyve logs an error performing a `BindUtil.get()`:
+  
+```
+14:09:22,785 SEVERE [SKYVE] (default task-14) Could not BindUtil.get(modules.finance.Transaction.TransactionExtension@b46ca56a#97175c28-e505-4f39-911e-9c6e11d0d6bf, allocations[0].relatedTransaction.source.selectedDebitAllocation)!
+14:09:22,785 SEVERE [SKYVE] (default task-14) The subsequent stack trace relates to obtaining bean property selectedDebitAllocation from modules.finance.domain.PaymentIn@de1d73c9#58db72b4-4ad1-451d-9526-29ed7112f1d9
+```
+
+The `Util.deproxy()` utility method lets you resolve this by loading the correct subclass.
+```java
+Occurrence occ = edc.getToBeOccurrence();
+occ = Util.deproxy(occ);
+if (occ instanceof DeviceOccurrence) {
+}
+```
+
+**[⬆ back to top](#contents)**
 
 ### Ordering a collection in a data table
 Collections can be ordered or unordered, where an ordered collection allows the user to define the sort of items in the list via drag and drop. Ordering on a collection can be enabled by adding the `ordered="true"` attribute to the collection declaration.
@@ -17,6 +37,7 @@ Collections can also have a default sorting by specifying the sort columns in th
   <order by="binding2" sort="ascending" />
 </ordering>
 ```
+
 **[⬆ back to top](#contents)**
 
 ### Troubleshooting
