@@ -6,6 +6,7 @@ Examples and code samples for using the [Skyve](http://skyve.org/) framework.
 * [Ordering a collection in a data table](#ordering-a-collection-in-a-data-table)
 * [Troubleshooting](#troubleshooting)
   * [Heap space errors](heap-space-errors)
+* [Creating Rest Services](#creating-rest-services)
 
 ### Deproxy 
 When to use:
@@ -71,3 +72,29 @@ Caused by: java.lang.OutOfMemoryError: Java heap space
     at org.skyve.impl.web.SkyveContextListener.contextInitialized(SkyveContextListener.java:60)
 ```
 **[⬆ back to top](#contents)**
+
+### Creating REST Services
+
+The `BasicAuthFilter` provided in Skyve can be used to allow authentication using a HTTP basic auth header. So a user can make REST requests using their existing credentials, or create a specific API user in Skyve which has permission to the API.
+
+The `web.xml` in the project will need to be updated to configure the filter, similar to the SkyveFacesFilter. Specify the 
+init params for realm (optional and defaulted) and unsecured (optional).
+
+You can either configure the filter in `web.xml` (see SkyveFacesFilter for something simliar) or by using a `@WebFilter` annotation on the class.
+
+For example: 
+
+```xml
+@WebFilter(filterName = "BasicAuthFilter", urlPatterns = {"/api/*"})
+
+```
+The filter has to init parameters:
+
+```java
+private String realm = “Protected”;
+private String[] unsecuredURLPrefixes;
+```
+
+The realm is used when an unauthorised response is sent, it is an arbitrary value.
+The unsecured URL prefixes allows you to create exceptions that will not be secured by the filter.
+Its similar in use to SkyveFacesFilter in web.xml (the URL prefixes are separated by a newline).
