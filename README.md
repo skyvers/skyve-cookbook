@@ -7,6 +7,7 @@ Examples and code samples for using the [Skyve](http://skyve.org/) framework.
 * [Troubleshooting](#troubleshooting)
   * [Heap space errors](heap-space-errors)
 * [Creating Rest Services](#creating-rest-services)
+* [Understanding Skyve Rest](#understanding-skyve-rest)
 
 ### Deproxy 
 When to use:
@@ -71,7 +72,6 @@ Caused by: java.lang.OutOfMemoryError: Java heap space
     at org.skyve.impl.util.UtilImpl.readJSONConfig(UtilImpl.java:197)
     at org.skyve.impl.web.SkyveContextListener.contextInitialized(SkyveContextListener.java:60)
 ```
-**[⬆ back to top](#contents)**
 
 ### Creating REST Services
 
@@ -98,3 +98,139 @@ private String[] unsecuredURLPrefixes;
 The realm is used when an unauthorised response is sent, it is an arbitrary value.
 The unsecured URL prefixes allows you to create exceptions that will not be secured by the filter.
 Its similar in use to SkyveFacesFilter in web.xml (the URL prefixes are separated by a newline).
+
+## Understanding Skyve Rest 
+Skyve provides a number of Rest endpoints to support whatever application you build.
+
+However to use these you will require a knowledge of Rest and web filters. An integration test is available at ```https://github.com/skyvers/skyve/blob/master/skyve-ee/src/test/org/skyve/impl/web/filter/rest/BasicAuthIT.java```
+
+You can  trial the endpoints in your browser to gain an understanding of how they work, before you begin coding interactions. To trial the endpoints, you'll need to edit the web.xml which is located in your project at:
+```/src/main/webapp/WEB-INF/web.xml```
+
+### Configuring The Session Filter
+Insert this filter and mapping after the other filters:
+```
+    <filter>
+        <display-name>RestFilter</display-name>
+        <filter-name>RestFilter</filter-name>
+        <filter-class>org.skyve.impl.web.filter.rest.SessionFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>RestFilter</filter-name>
+		<url-pattern>/rest/*</url-pattern>
+    </filter-mapping>
+```    
+
+Then redploy your app (or restart your app server).
+
+### Testing end points
+The SessionFilter will allow you to interact with the end points while you have a valid Session, and you'll be redirected to a login page at the first interaction to authenticate. Once you've logged in, you can then exercise the endpoints using your browser. The SessionFilter allows you to make Rest calls after initial login that will propagate the remote user onto the Rest call’s execution context (the logged in user).
+
+For example:
+```http://localhost:8080/<projectName>/rest/json/admin/Contact```
+
+This end point will return an array of json strings for all user contacts. Note that the address includes
+- _rest_ - the filtered service 
+- _json_ - the specific implemented result type
+- _admin_ - the Skyve module
+- _Contact_ - the Skyve document
+
+Your result will be similar to the following:
+```[{"bizModule":"admin","bizDocument":"Contact","name":"admin","contactType":"Person","email1":"admin@skyve.org","mobile":"","image":"","bizId":"e4d033b8-7012-47f1-9344-f1676fea6be5","bizCustomer":"bizHub","bizDataGroupId":null,"bizUserId":"01f82b45-9374-434f-a058-a94c5fa98329"}]```
+
+In the example above there is only one Contact in the database, called admin. The fields returned are the fields which would be returned if you used the menu item Contacts in admin module, that is, the default Skyve query for Contacts.
+
+To retrieve a specific instance, use the bizId of the instance in the address, for example:
+
+```http://localhost:8080/<projectName>/rest/json/admin/Contact/e4d033b8-7012-47f1-9344-f1676fea6be5```
+
+Note that the id matches the bizId in the prior example, and that the entire Contact object is now retrieved - not only the fields in the default query. This includes the result of conditions declared in the Contact document.
+
+```{"created":true,"notPersisted":false,"persisted":true,"changed":false,"notCreated":false,"notChanged":true,"bizId":"e4d033b8-7012-47f1-9344-f1676fea6be5","bizVersion":0,"bizLock":"20180305223718156admin","bizFlagComment":null,"bizDataGroupId":null,"bizUserId":"01f82b45-9374-434f-a058-a94c5fa98329","name":"admin","contactType":"person","email1":"admin@skyve.org","mobile":null,"image":null}```
+
+To retrieve data from a specific query, provide the query name, for example:
+
+```http://localhost:8080/<projectName>/rest/json/query/admin/qContacts/```
+
+To retrieve a paged result set, provide the start and end rows and the specific Skyve query name, for example to retrieve results 0 to 9:
+
+```http://localhost:8080/siteStorage/rest/json/query/admin/qContacts?start=0&end=9```
+
+There are also endpoints provide for insert, update and delete. 
+
+```
+http://localhost:8080/<projectName>/rest/json/insert/
+http://localhost:8080/<projectName>/rest/json/update/
+http://localhost:8080/<projectName>/rest/json/delete/
+```
+
+These require a complete json representation of the object to be manipulated. For example, the update the email address of the contact `admin` in the prior example from `admin@skyve.org` to `test@skyve.org`, supply the modified json as follows:
+
+```
+http://localhost:8080/<projectName>/rest/json/update/{"created":true,"notPersisted":false,"persisted":true,"changed":false,"notCreated":false,"notChanged":true,"bizId":"e4d033b8-7012-47f1-9344-f1676fea6be5","bizVersion":0,"bizLock":"20180305223718156admin","bizFlagComment":null,"bizDataGroupId":null,"bizUserId":"01f82b45-9374-434f-a058-a94c5fa98329","name":"admin","contactType":"person","email1":"test@skyve.org","mobile":null,"image":null}
+```
+
+### Using the BasicAuthFilter
+When you're ready to start coding comment out the following:
+
+```xml
+ <!-- Secure rest services -->
+            <url-pattern>/rest/*</url-pattern>
+```
+
+in your web.xml
+
+This will stop these url patterns redirecting to the login page, and change the filter to the BasicAuthFilter as follows:
+
+```xml
+<filter-class>org.skyve.impl.web.filter.rest.SessionFilter</filter-class>
+```
+
+to
+
+```xml
+<filter-class>org.skyve.impl.web.filter.rest.BasicAuthFilter</filter-class>
+```
+
+The BasicAuthFilter allows authentication using a HTTP basic auth header. You can use the class by just changing the package to your package - there are no extra dependencies introduced by its use.
+
+You can either configure the filter in web.xml (see SkyveFacesFilter for something similar) or by using a
+
+```@WebFilter```
+
+annotation on the class
+
+For example:
+```@WebFilter(filterName = "BasicAuthFilter", urlPatterns = {"/api/*"})```
+
+The filter has to init parameters.
+
+```
+private String realm = “Protected”;
+private String[] unsecuredURLPrefixes;
+```
+
+The realm is used when an unauthorised response is sent (it is an arbitrary value). The unsecured URL prefixes allows you to create exceptions that will not be secured by the filter. For comparison, review the SkyveFacesFilter in web.xml (the URL prefixes are separated by a newline).
+
+### Example usage from a react android app
+```javascript
+const base64 = require('base-64');
+var headers = new Headers();
+headers.append("Authorization", "Basic " + base64.encode("admin:password01"));
+console.log(headers);
+fetch('http://192.168.43.91:8080/<projectName>/rest/json/query/admin/qContacts', {
+headers: headers
+})
+.then((response) => {
+console.log('response:',response);
+})
+.catch((error) => {
+console.error("err" + error);
+}
+```
+
+### Other Resources
+https://github.com/skyvers/skyve/tree/master/skyve-web/src/main/java/org/skyve/impl/web/service/rest
+https://github.com/skyvers/skyve/blob/master/skyve-ee/src/test/org/skyve/impl/web/filter/rest/BasicAuthIT.java
+
+**[⬆ back to top](#contents)**
