@@ -211,9 +211,10 @@ http://localhost:8080/<projectName>/rest/json/delete/
 
 These require a complete json representation of the object to be manipulated. For example, the update the email address of the contact `admin` in the prior example from `admin@skyve.org` to `test@skyve.org`, supply the modified json as follows:
 
+```bash
+curl -X POST -H "Content-Type: application/json" -d '{"created":true,"notPersisted":false,"persisted":true,"changed":false,"notCreated":false,"notChanged":true,"bizId":"e4d033b8-7012-47f1-9344-f1676fea6be5","bizVersion":0,"bizLock":"20180305223718156admin","bizFlagComment":null,"bizDataGroupId":null,"bizUserId":"01f82b45-9374-434f-a058-a94c5fa98329","name":"admin","contactType":"person","email1":"test@skyve.org","mobile":null,"image":null}' http://localhost:8080/<projectName>/rest/json/update/
 ```
-http://localhost:8080/<projectName>/rest/json/update/{"created":true,"notPersisted":false,"persisted":true,"changed":false,"notCreated":false,"notChanged":true,"bizId":"e4d033b8-7012-47f1-9344-f1676fea6be5","bizVersion":0,"bizLock":"20180305223718156admin","bizFlagComment":null,"bizDataGroupId":null,"bizUserId":"01f82b45-9374-434f-a058-a94c5fa98329","name":"admin","contactType":"person","email1":"test@skyve.org","mobile":null,"image":null}
-```
+_Note: on Windows, you will need to use double quotes instead of single quotes around the JSON, and escape the double quotes with a backslash, e.g. "{\"created\":true. This can also be performed as a GET request if the JSON is properly escaped._
 
 ### Using the BasicAuthFilter
 When you're ready to start coding comment out the following in your `web.xml`:
@@ -245,7 +246,7 @@ For example:
 @WebFilter(filterName = "BasicAuthFilter", urlPatterns = {"/api/*"})
 ```
 
-The filter has to init parameters.
+The filter has two init parameters:
 
 ```
 private String realm = “Protected”;
