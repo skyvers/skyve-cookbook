@@ -8,6 +8,7 @@ Examples and code samples for using the [Skyve](http://skyve.org/) framework.
   * [Heap space errors](heap-space-errors)
 * [Creating Rest Services](#creating-rest-services)
 * [Understanding Skyve Rest](#understanding-skyve-rest)
+* [Problems with utf8 - character sets for other languages - MySQL](#problems_with_utf8_-_character_sets_for_other_languages_-mysql)
 
 ### Deproxy 
 When to use:
@@ -280,5 +281,29 @@ console.error("err" + error);
 ### Other Resources
 https://github.com/skyvers/skyve/tree/master/skyve-web/src/main/java/org/skyve/impl/web/service/rest
 https://github.com/skyvers/skyve/blob/master/skyve-ee/src/test/org/skyve/impl/web/filter/rest/BasicAuthIT.java
+
+## Problems with utf8 - character sets for other languages - MySQL
+If your Skyve application is not storing utf8 chars correctly, and you're using MySQL, check that MySQL is configured for utf8. Check the charset of the DB and tables, e.g. the default  is 'latin1'.
+
+In the my.cnf file (for MySQL), check that you have the following:
+```
+[client]
+default-character-set=utf8
+
+[mysql]
+default-character-set=utf8
+
+[mysqld]
+collation-server = utf8_unicode_ci
+init-connect='SET NAMES utf8'
+character-set-server = utf8
+```
+
+To keep an existing database once this change has been made, export the schema from MySQL workbench, use text edit change latin1 to utf8, then drop your schema and import the edited one.
+
+If you don't need to keep existing data, then after the my.cnf changes above, drop your schema, create a new one, then use Skyve bootstrap (in the json settings file) to log in and let Skyve create the new schema for you.
+
+### Other Resources
+https://stackoverflow.com/questions/3513773/change-mysql-default-character-set-to-utf-8-in-my-cnf
 
 **[⬆ back to top](#contents)**
