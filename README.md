@@ -8,7 +8,8 @@ Examples and code samples for using the [Skyve](http://skyve.org/) framework.
   * [Heap space errors](heap-space-errors)
 * [Creating Rest Services](#creating-rest-services)
 * [Understanding Skyve Rest](#understanding-skyve-rest)
-* [Problems with utf8 - character sets for other languages - MySQL](#problems_with_utf8_-_character_sets_for_other_languages_-mysql)
+* [Problems with utf8 - character sets for other languages - MySQL](#problems-with-utf8---character-sets-for-other-languages---mysql)
+* [Customer Scoped Roles](#customer-scoped-roles)
 
 ### Deproxy 
 When to use:
@@ -74,6 +75,8 @@ Caused by: java.lang.OutOfMemoryError: Java heap space
     at org.skyve.impl.web.SkyveContextListener.contextInitialized(SkyveContextListener.java:60)
 ```
 
+**[⬆ back to top](#contents)**
+
 ### Creating REST Services
 
 The `BasicAuthFilter` provided in Skyve can be used to allow authentication using a HTTP basic auth header. So a user can make REST requests using their existing credentials, or create a specific API user in Skyve which has permission to the API.
@@ -100,7 +103,7 @@ The realm is used when an unauthorised response is sent, it is an arbitrary valu
 The unsecured URL prefixes allows you to create exceptions that will not be secured by the filter.
 Its similar in use to SkyveFacesFilter in web.xml (the URL prefixes are separated by a newline).
 
-## Understanding Skyve Rest 
+### Understanding Skyve Rest 
 Skyve provides a number of Rest endpoints to support whatever application you build.
 
 However to use these you will require a knowledge of Rest and web filters. An integration test is available at [BasicAuthIT.java](https://github.com/skyvers/skyve/blob/master/skyve-ee/src/test/org/skyve/impl/web/filter/rest/BasicAuthIT.java).
@@ -108,7 +111,7 @@ However to use these you will require a knowledge of Rest and web filters. An in
 You can  trial the endpoints in your browser to gain an understanding of how they work, before you begin coding interactions. To trial the endpoints, you'll need to edit the web.xml which is located in your project at:
 `/src/main/webapp/WEB-INF/web.xml`
 
-### Configuring The Session Filter
+#### Configuring The Session Filter
 Insert this filter and mapping after the other filters:
 ```xml
 <filter>
@@ -124,7 +127,7 @@ Insert this filter and mapping after the other filters:
 
 Then redploy your app (or restart your app server).
 
-### Testing end points
+#### Testing end points
 The SessionFilter will allow you to interact with the end points while you have a valid Session, and you'll be redirected to a login page at the first interaction to authenticate. Once you've logged in, you can then exercise the endpoints using your browser. The SessionFilter allows you to make REST calls after initial login that will propagate the remote user onto the REST call’s execution context (the logged in user).
 
 For example:
@@ -217,7 +220,7 @@ curl -X POST -H "Content-Type: application/json" -d '{"created":true,"notPersist
 ```
 _Note: on Windows, you will need to use double quotes instead of single quotes around the JSON, and escape the double quotes with a backslash, e.g. "{\"created\":true. This can also be performed as a GET request if the JSON is properly escaped._
 
-### Using the BasicAuthFilter
+#### Using the BasicAuthFilter
 When you're ready to start coding comment out the following in your `web.xml`:
 
 ```xml
@@ -256,12 +259,12 @@ private String[] unsecuredURLPrefixes;
 
 The realm is used when an unauthorised response is sent (it is an arbitrary value). The unsecured URL prefixes allows you to create exceptions that will not be secured by the filter. For comparison, review the SkyveFacesFilter in web.xml (the URL prefixes are separated by a newline).
 
-### Example (CURL)
+#### Example (CURL)
 ```bash
 curl --user name:password http://192.168.43.91:8080/<projectName>/rest/json/query/admin/qContacts
 ```
 
-### Example (React)
+#### Example (React)
 ```javascript
 const base64 = require('base-64');
 var headers = new Headers();
@@ -278,11 +281,13 @@ console.error("err" + error);
 }
 ```
 
-### Other Resources
+#### Other Resources
 https://github.com/skyvers/skyve/tree/master/skyve-web/src/main/java/org/skyve/impl/web/service/rest
 https://github.com/skyvers/skyve/blob/master/skyve-ee/src/test/org/skyve/impl/web/filter/rest/BasicAuthIT.java
 
-## Problems with utf8 - character sets for other languages - MySQL
+**[⬆ back to top](#contents)**
+
+### Problems with utf8 - character sets for other languages - MySQL
 If your Skyve application is not storing utf8 chars correctly, and you're using MySQL, check that MySQL is configured for utf8. Check the charset of the DB and tables, e.g. the default  is 'latin1'.
 
 In the my.cnf file (for MySQL), check that you have the following:
@@ -303,7 +308,32 @@ To keep an existing database once this change has been made, export the schema f
 
 If you don't need to keep existing data, then after the my.cnf changes above, drop your schema, create a new one, then use Skyve bootstrap (in the json settings file) to log in and let Skyve create the new schema for you.
 
-### Other Resources
+#### Other Resources
 https://stackoverflow.com/questions/3513773/change-mysql-default-character-set-to-utf-8-in-my-cnf
+
+**[⬆ back to top](#contents)**
+
+### Customer Scoped Roles
+
+While Groups and Roles allow user permissions to be managed at the _module_ level, some applications have permissions which span multiple modules and the permissions need a way to be linked to function correctly (e.g. a user may have incomplete access to application features if module permissions were not correctly applied to their account). To address this, a customer scoped role can be defined in the `customer.xml` which allows roles to be aggregated together into something coherent and cross module.
+
+```xml
+<roles allowModuleRoles="true">
+    <!-- External Access Roles -->
+    <role name="External Basic">
+        <description>Basic role for all external users</description>
+        <roles>
+            <role module="admin" name="BasicUser"/>
+            <role module="admin" name="AppUser"/>
+            <role module="module1" name="ExternalBasic"/>
+            <role module="module2" name="ExternalBasic"/>
+        </roles>
+    </role>
+</roles>
+```
+
+The `allowModuleRoles` property controls whether the module roles show up in the admin User Interface or not.
+
+Customer roles aggregate only module roles, they cannot reference other customer roles. Groups can be used to aggregate either module rules or customer roles (if enabled by `allowModuleRoles`).
 
 **[⬆ back to top](#contents)**
