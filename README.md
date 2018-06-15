@@ -2,6 +2,7 @@
 Examples and code samples for using the [Skyve](http://skyve.org/) framework.
 
 ### Contents
+* [Skyve Script](#skyve-script)
 * [Deproxy](#deproxy)
 * [Ordering a collection in a data table](#ordering-a-collection-in-a-data-table)
 * [Troubleshooting](#troubleshooting)
@@ -10,6 +11,91 @@ Examples and code samples for using the [Skyve](http://skyve.org/) framework.
 * [Understanding Skyve Rest](#understanding-skyve-rest)
 * [Problems with utf8 - character sets for other languages - MySQL](#problems-with-utf8---character-sets-for-other-languages---mysql)
 * [Customer Scoped Roles](#customer-scoped-roles)
+
+### Skyve Script
+Skyve Script is a new abbreviated way to declare a no-code application – using the markdown standard to allow developers to specify domain models.
+
+#### Quick Overview
+In Skyve Script, a document declaration looks like this:
+```markdown
+## Address `Address`
+- *addressLine1* text 100
+- addressLine2 text 100
+- addressLine3 text 100
+- *suburb* text 50
+- state enum (QLD,NSW,WA,NT,ACT,SA,VIC,TAS)
+- *country* Country
+- verified boolean
+```
+
+Skyve Script supports complex applications, with relationships between documents, for example:
+```markdown
+## Organisation `Organisation`
+- *name* text 100
+- businessAddress Address
+- postalAddress Address
+- deliveryAddress Address
+```
+
+The script for a complete “Organisation Address Book” application module would then be:
+```markdown
+# "Organisation Address Book"
+
+## Address `Address`
+- *addressLine1* text 100
+- addressLine2 text 100
+- addressLine3 text 100
+- *suburb* text 50
+- state enum (QLD,NSW,WA,NT,ACT,SA,VIC,TAS)
+- *country* Country
+- verified boolean
+
+## Country `Country`
+- *name* text 100
+
+## Organisation `Organisation`
+- *name* text 100
+- businessAddress Address
+- postalAddress Address
+- deliveryAddress Address
+```
+
+#### Using Skyve Script
+You can use Skyve Script with the Skyve online project creator for a new project, or within an existing Skyve application to create additional documents.
+
+Within an existing Skyve application, the Skyve admin module provides the Document Creator – a user interface for editing Skyve Script. By placing your markdown in the Input tab, the system will preview the markdown and generated document declaration when you change tab. Any errors will be highlighted in red in the Document Preview tab.
+
+The power of Skyve Script is that you can create it anywhere anytime, on your phone, in notepad or on paper. You don’t need a UML modelling application or diagramming tool, but it is sufficient to create a functioning no-code application in Skyve.
+
+While Skyve Script is sophisticated enough to build real no-code applications, it is intended as a rapid development technique and not a replacement for a complete Skyve declaration. While the full Skyve declaration standard supports rich domain models sufficient for enterprise scale, sophisticated mission critical systems, Skyve Script will get you to a functioning no-code application in minutes.
+
+#### Syntax
+Skyve Script has a few specific syntax requirements it is looking for when generating domain models:
+
+* New modules should be specified with a level 1 heading (#), followed by a space, then the module name in title case
+  * e.g. `# Admin`
+  * If a specific module title is required, it can be encapsulated in single or double quotes, e.g. `# 'My Module'`
+* New domain models (documents), should be specified with a level 2 heading (##), followed by a space, then the document name in title case
+  * e.g. `## User`
+  * If a specific document title is required, it can be encapsulated in single or double quotes, e.g. `## 'My Document'`
+  * If the document is to be persisted, the persistent name should follow the document name surrounded by backticks (&#96;), e.g. `` ## User `ADM_User` ``
+* Domain attributes (fields) should be specified as a list below the domain heading, by using a dash (-), followed by a space, then the attribute definition
+  * Attribute definitions should start with the attribute name in camel case (no spaces, first letter lowercase, uppercase for new words), e.g. `firstName`
+  * Required attributes should have their name surrounded by asterisks, e.g. `- *firstName*`
+  * The type should follow the attribute name
+  * If the type is text, the length should follow the type, e.g. `- *firstName* text 150`
+  * If the type is enum, the values should follow the type in brackets, e.g. `- state enum ("Not Started", 'In Progress', Complete)`
+  * If a specific display name is required, it can be encapsulated in single or double quotes, e.g. `- 'Yes/No'`
+* Associations should be specified as a list item by using a dash (-), followed by a space, then the association name in camel case, then the association document in title case
+  * e.g. `- country Country`
+  * Required associations should have their name surrounded by asterisks, e.g. `- *country* Country`
+  * Association type can be specified surrounded by backticks after the document name, e.g. `` - country Country `composition` ``
+* Collections should be specified as a list item by using a plus (+), followed by a space, then the collection name in camel case, then the collection document in title case
+  * e.g. `+ roles Role`
+  * Required collections should have their name surrounded by asterisks, e.g. `+ *roles* Role`
+  * Collection type can be specified surrounded by backticks after the document name, e.g. `` - roles Role `child` ``
+
+**[⬆ back to top](#contents)**
 
 ### Deproxy 
 When to use:
