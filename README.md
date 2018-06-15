@@ -93,7 +93,7 @@ Skyve Script has a few specific syntax requirements it is looking for when gener
 * Collections should be specified as a list item by using a plus (+), followed by a space, then the collection name in camel case, then the collection document in title case
   * e.g. `+ roles Role`
   * Required collections should have their name surrounded by asterisks, e.g. `+ *roles* Role`
-  * Collection type can be specified surrounded by backticks after the document name, e.g. `` - roles Role `child` ``
+  * Collection type can be specified surrounded by backticks after the document name, e.g. `` + roles Role `child` ``
 
 **[⬆ back to top](#contents)**
 
