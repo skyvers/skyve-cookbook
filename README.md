@@ -148,15 +148,15 @@ Your result will be similar to the following:
   {
     "bizModule":"admin",
     "bizDocument":"Contact",
-    "name":"admin",
+    "name":"Aaliyah Bowling",
     "contactType":"Person",
-    "email1":"admin@skyve.org",
-    "mobile":"",
+    "email1":"aaliyah.bowling@whosin.com",
+    "mobile":"0474 618 810",
     "image":"",
-    "bizId":"e4d033b8-7012-47f1-9344-f1676fea6be5",
-    "bizCustomer":"bizHub",
+    "bizId":"58619c0d-496b-49e6-9fcb-ff43281ae740",
+    "bizCustomer":"demo",
     "bizDataGroupId":null,
-    "bizUserId":"01f82b45-9374-434f-a058-a94c5fa98329"
+    "bizUserId":"bf8cb7c4-5d8a-477b-8b96-15a2bc72364a"
   }
 ]
 ```
@@ -166,32 +166,30 @@ In the example above, there is only one Contact in the database, called admin. T
 To retrieve a specific instance, use the bizId of the instance in the address, for example:
 
 ```
-http://localhost:8080/<projectName>/rest/json/admin/Contact/e4d033b8-7012-47f1-9344-f1676fea6be5
+http://localhost:8080/<projectName>/rest/json/admin/Contact/58619c0d-496b-49e6-9fcb-ff43281ae740
 ```
 
 Note that the id matches the bizId in the prior example, and that the entire Contact object is now retrieved - not only the fields in the default query. This includes the result of conditions declared in the Contact document.
 
 ```json
-{
-  "created":true,
-  "notPersisted":false,
-  "persisted":true,
-  "changed":false,
-  "notCreated":false,
-  "notChanged":true,
-  "bizId":"e4d033b8-7012-47f1-9344-f1676fea6be5",
-  "bizVersion":0,
-  "bizLock":"20180305223718156admin",
-  "bizFlagComment":null,
+ {
+  "bizModule":"admin",
+  "bizDocument":"Contact",
+  "name":"Aaliyah Bowling",
+  "contactType":"Person",
+  "email1":"aaliyah.bowling@whosin.com",
+  "mobile":"0474 618 810",
+  "image":"",
+  "bizId":"58619c0d-496b-49e6-9fcb-ff43281ae740",
+  "bizCustomer":"demo",
   "bizDataGroupId":null,
-  "bizUserId":"01f82b45-9374-434f-a058-a94c5fa98329",
-  "name":"admin",
-  "contactType":"person",
-  "email1":"admin@skyve.org",
-  "mobile":null,
-  "image":null
-}
+  "bizUserId":"bf8cb7c4-5d8a-477b-8b96-15a2bc72364a",
+  "bizVersion":5,
+  "bizLock":"20170410143341392demo"
+ }
 ```
+Note the attributes, bizCustomer, bizModule and bizDocument define the specific entity. When using insert and update endpoints, these attributes specify the entity to be manipulated.
+
 
 To retrieve data from a specific query, provide the query name, for example:
 
@@ -213,10 +211,12 @@ http://localhost:8080/<projectName>/rest/json/update/
 http://localhost:8080/<projectName>/rest/json/delete/
 ```
 
-These require a complete json representation of the object to be manipulated. For example, the update the email address of the contact `admin` in the prior example from `admin@skyve.org` to `test@skyve.org`, supply the modified json as follows:
+These require a complete json representation of the object to be manipulated. These endpoints utilise the bizCustomer, bizModule and bizDocument within the json representation.
+
+For example, the update the email address of the contact `admin` in the prior example from `aaliyah.bowling@whosin.com` to `aaliyah.bowling@skyve.org`, supply the modified json as follows:
 
 ```bash
-curl -X POST -H "Content-Type: application/json" -d '{"created":true,"notPersisted":false,"persisted":true,"changed":false,"notCreated":false,"notChanged":true,"bizId":"e4d033b8-7012-47f1-9344-f1676fea6be5","bizVersion":0,"bizLock":"20180305223718156admin","bizFlagComment":null,"bizDataGroupId":null,"bizUserId":"01f82b45-9374-434f-a058-a94c5fa98329","name":"admin","contactType":"person","email1":"test@skyve.org","mobile":null,"image":null}' http://localhost:8080/<projectName>/rest/json/update/
+curl -X POST -H "Content-Type: application/json" -d '{"bizModule":"admin","bizDocument":"Contact","name":"Aaliyah Bowling","contactType":"Person","email1":"aaliyah.bowling@skyve.org","mobile":"0474 618 810","image":"","bizId":"58619c0d-496b-49e6-9fcb-ff43281ae740","bizCustomer":"demo","bizDataGroupId":null,"bizUserId":"bf8cb7c4-5d8a-477b-8b96-15a2bc72364a","bizVersion":5,"bizLock":"20170410143341392demo"}' http://localhost:8080/<projectName>/rest/json/update/
 ```
 _Note: on Windows, you will need to use double quotes instead of single quotes around the JSON, and escape the double quotes with a backslash, e.g. "{\"created\":true. This can also be performed as a GET request if the JSON is properly escaped._
 
