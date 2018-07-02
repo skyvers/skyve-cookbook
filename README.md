@@ -11,6 +11,7 @@ Examples and code samples for using the [Skyve](http://skyve.org/) framework.
 * [Understanding Skyve Rest](#understanding-skyve-rest)
 * [Problems with utf8 - character sets for other languages - MySQL](#problems-with-utf8---character-sets-for-other-languages---mysql)
 * [Customer Scoped Roles](#customer-scoped-roles)
+* [SAIL Automated UI Tests](#sail-automated-ui-tests)
 
 ### Skyve Script
 Skyve Script is a new abbreviated way to declare a no-code application – using the markdown standard to allow developers to specify domain models.
@@ -421,5 +422,42 @@ While Groups and Roles allow user permissions to be managed at the _module_ leve
 The `allowModuleRoles` property controls whether the module roles show up in the admin User Interface or not.
 
 Customer roles aggregate only module roles, they cannot reference other customer roles. Groups can be used to aggregate either module rules or customer roles (if enabled by `allowModuleRoles`).
+
+### SAIL Automated UI Tests
+- download the latest chromdriver.exe from http://chromedriver.chromium.org/downloads
+- update src/test/java/sail/admin/AdminSail.java with the location of the downloaded chromedriver (line 12) and the baseUrl (line 17)
+- ensure you have the following dependencies in the project pom.xml
+```
+       <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-support</artifactId>
+            <version>3.11.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>2.8.2</version>
+            <scope>test</scope>
+        </dependency>        
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-chrome-driver</artifactId>
+            <version>3.11.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-firefox-driver</artifactId>
+            <version>3.11.0</version>
+            <scope>test</scope>
+        </dependency>  
+```
+- generate domain to make sure dependencies have been downloaded
+- check src/test/java/sail/admin/AdminFunctionSail.java and update the login instructions with correct login credentials for your project (login doesn't appear to support a default customer - so remove that from .json if you have it)
+- start wildfly server and deploy project
+- right-click AdminFunctionSail and run as JUnit- browser should fire up and tests should begin
+
+
 
 **[⬆ back to top](#contents)**
