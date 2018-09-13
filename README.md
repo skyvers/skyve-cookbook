@@ -333,13 +333,13 @@ You can either configure the filter in web.xml (see SkyveFacesFilter for somethi
 
 For example:
 
-```
+```java
 @WebFilter(filterName = "BasicAuthFilter", urlPatterns = {"/api/*"})
 ```
 
 The filter has two init parameters:
 
-```
+```java
 private String realm = “Protected”;
 private String[] unsecuredURLPrefixes;
 ```
@@ -366,6 +366,42 @@ console.log('response:',response);
 .catch((error) => {
 console.error("err" + error);
 }
+```
+
+#### Using the RestUserPersistenceFilter
+If your REST API:
+
+- does not use basic authentication
+- requires some other form of authentication not able to be performed in a filter
+- is not being performed on behalf of a system user (e.g. a request from a 3rd party service)
+
+You will still need a user set on the Skyve Persistence in order to query or update the database. The BasicAuthFilter attempst to use the Basic credentials supplied to authenticate and perform database requests. Another option is to create a specific API user which has the roles and permissions the API can access. The RestUserPersistenceFilter allows a named user to be specified for all requests which match a URL pattern.
+
+If this sounds like the scenario you require, to begin using the filter addo the following in your `web.xml` (near the other filters):
+
+```xml
+    <filter>
+		<filter-name>RestUserPersistenceFilter</filter-name>
+		<filter-class>org.skyve.impl.web.filter.rest.RestUserPersistenceFilter</filter-class>
+		<init-param>
+			<param-name>PersistenceUser</param-name>
+			<param-value>{restUsername}</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>RestUserPersistenceFilter</filter-name>
+		<url-pattern>{restUrlPattern}</url-pattern>
+	</filter-mapping>
+```
+
+You will need to change `{restUsername}` to the username of the API user you create in the admin module.
+
+Modify `{restUrlPattern}` to be the url endpoint your API controller is listening at.
+
+You will also need to update `src/main/webapp/WEB-INF/spring/security.xml` to allow unauthenticated requests:
+
+```xml
+<intercept-url pattern="{restUrlPattern}" access="permitAll" method="POST" />
 ```
 
 #### Other Resources
