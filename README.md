@@ -19,7 +19,7 @@ Skyve Script is a new abbreviated way to declare a no-code application – using
 #### Quick Overview
 In Skyve Script, a document declaration looks like this:
 ```markdown
-## Address `Address`
+## Address `MDL_Address`
 - *addressLine1* text 100
 - addressLine2 text 100
 - addressLine3 text 100
@@ -31,7 +31,7 @@ In Skyve Script, a document declaration looks like this:
 
 Skyve Script supports complex applications, with relationships between documents, for example:
 ```markdown
-## Organisation `Organisation`
+## Organisation `MDL_Organisation`
 - *name* text 100
 - businessAddress Address
 - postalAddress Address
@@ -42,7 +42,7 @@ The script for a complete “Organisation Address Book” application module wou
 ```markdown
 # "Organisation Address Book"
 
-## Address `Address`
+## Address `MDL_Address`
 - *addressLine1* text 100
 - addressLine2 text 100
 - addressLine3 text 100
@@ -51,10 +51,10 @@ The script for a complete “Organisation Address Book” application module wou
 - *country* Country
 - verified boolean
 
-## Country `Country`
+## Country `MDL_Country`
 - *name* text 100
 
-## Organisation `Organisation`
+## Organisation `MDL_Organisation`
 - *name* text 100
 - businessAddress Address
 - postalAddress Address
@@ -380,18 +380,18 @@ You will still need a user set on the Skyve Persistence in order to query or upd
 If this sounds like the scenario you require, to begin using the filter addo the following in your `web.xml` (near the other filters):
 
 ```xml
-    <filter>
-		<filter-name>RestUserPersistenceFilter</filter-name>
-		<filter-class>org.skyve.impl.web.filter.rest.RestUserPersistenceFilter</filter-class>
-		<init-param>
-			<param-name>PersistenceUser</param-name>
-			<param-value>{restUsername}</param-value>
-		</init-param>
-	</filter>
-	<filter-mapping>
-		<filter-name>RestUserPersistenceFilter</filter-name>
-		<url-pattern>{restUrlPattern}</url-pattern>
-	</filter-mapping>
+<filter>
+	<filter-name>RestUserPersistenceFilter</filter-name>
+	<filter-class>org.skyve.impl.web.filter.rest.RestUserPersistenceFilter</filter-class>
+	<init-param>
+		<param-name>PersistenceUser</param-name>
+		<param-value>{restUsername}</param-value>
+	</init-param>
+</filter>
+<filter-mapping>
+	<filter-name>RestUserPersistenceFilter</filter-name>
+	<url-pattern>{restUrlPattern}</url-pattern>
+</filter-mapping>
 ```
 
 You will need to change `{restUsername}` to the username of the API user you create in the admin module.
