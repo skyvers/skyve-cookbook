@@ -506,12 +506,14 @@ We recommend the following:
 
 #### Installation of prerequisites
 To run a Skyve application, the server requires:
-* Java 8 (also called 1.8) – while the JRE is sufficient, the JDK is recommended.
-- Download the Java JDK 8u191 from https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html 
-- These instructions may assist for linux - https://docs.oracle.com/javase/8/docs/technotes/guides/install/linux_jdk.html#BJFGGEFG (though note that this mentions an slightly older version of Java)
-* Wildfly 10.1.0.Final 
-- Download from http://wildfly.org/downloads/   
-- This link may assist - https://linuxtechlab.com/wildfly-10-10-1-0-installation/ 
+
+Java 8 (also called 1.8) – while the JRE is sufficient, the JDK is recommended.
+ - Download the Java JDK 8u191 from https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html 
+ - These instructions may assist for linux - https://docs.oracle.com/javase/8/docs/technotes/guides/install/linux_jdk.html#BJFGGEFG (though note that this mentions an slightly older version of Java)
+
+Wildfly 10.1.0.Final 
+ - Download from http://wildfly.org/downloads/   
+ - This link may assist - https://linuxtechlab.com/wildfly-10-10-1-0-installation/ 
 
 #### Installing database driver
 For database access, load the appropriate driver and declare this driver in the Wildfly standalone.xml configuration file.
@@ -559,8 +561,40 @@ Skyve includes the elastic content repository - the repository requires a dedica
 So that the Skyve application will be always available, install the wildfly service, ensuring that the service will have read/write access to the content folder.
 The following may be useful for linux installations - https://community.i2b2.org/wiki/display/getstarted/2.4.2.3+Run+Wildfly+as+a+Linux+Service
 
+#### Skyve application configuration
+To deploy a Skyve application, there are typically three artefacts:
+- the application '.war' folder
+- the datasource 'ds.xml' file
+- the properties '.json' file
 
-When deploying the Skyve application web archive (war), ensure that matching configuration settings are updated in the associated ds.xml and .json configuration files.
+For example, if your Skyve application is called 'helloworld', these will be:
+- 'helloworld.war'
+- 'helloworld-ds.xml'
+- 'helloworld.json'
 
+The 'ds.xml' and '.json' remain on the server you are deploying to, and are customised for that specific instance, so that when you are  deploying a new version of your Skyve application, the instance settings do not need to be adjusted.
+
+When deploying the Skyve application web archive 'war', ensure that matching configuration settings are updated in the associated 'ds.xml' and '.json' configuration files. 
+
+Ensure the 'ds.xml' file uses a connection string and credentials corresponding to the setting for the database driver above
+
+Ensure the '.json' properties file has been updated for the specific instance including:
+- content directory
+- smtp settings
+- context url
+- maps and other api keys
+- environment identifier
+
+#### Deploying a new version of your Skyve application
+Once a Skyve application has been successfully deployed, to update your application with a new version:
+- undeploy the previous version or stop the wildfly service
+- replace the application '.war' folder with the new version (remove the old version, copy in the new)
+- deploy the new version or start the wildfly service
+
+If the server has multiple Skyve application deployments, you can replace one of these without impacting on other deployments by signalling an undeployment and deployment as follows:
+
+To undeploy, create an '.undeploy' file in the wildfly/standalone/deployment/ folder corresponding to the name of your application (an empty text file with that name is all that is required), for example 'helloworld.undeploy'. After approximately 30s, wildlfly will replace this file with a file named 'helloworld.undeployed'. 
+
+To redeploy, create a '.dodeploy' file in the wildfly/standalone/deployment/ folder corresponding to the name of your application, for example 'helloworld.dodeploy' (an empty text file with that name is all that is required). After approximately 30s, wildfly will replace this file with 'helloworld.isdeploying' and once deployment is successful, wildfly will replace this with 'helloworld.deployed' (if successful) or 'helloworld.failed' (if unsuccesful).
 
 **[⬆ back to top](#contents)**
