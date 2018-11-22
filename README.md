@@ -585,6 +585,8 @@ Ensure the '.json' properties file has been updated for the specific instance in
 - maps and other api keys
 - environment identifier
 
+Finally, ensure that the user credential that will run the wildfly service has read/write permissions to the wildfly folder and the content folder created above.
+
 #### Deploying a new version of your Skyve application
 Once a Skyve application has been successfully deployed, to update your application with a new version:
 - undeploy the previous version or stop the wildfly service
