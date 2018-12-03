@@ -671,5 +671,4 @@ Now you can log in as the setup user in the new customer _acme_ - with the follo
 
 ![Customer sign in](/assets/images/skyve_customer_sign_in.png "Skyve customer sign in")
 
-
 **[⬆ back to top](#contents)**
