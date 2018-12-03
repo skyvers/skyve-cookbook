@@ -13,9 +13,10 @@ Examples and code samples for using the [Skyve](http://skyve.org/) framework.
 * [Customer Scoped Roles](#customer-scoped-roles)
 * [SAIL Automated UI Tests](#sail-automated-ui-tests)
 * [Setting up a Skyve instance](#setting-up-a-skyve-instance)
+* [Manually seeding new customer users](#manually-seeding-new-customer-users)
 
 ### Skyve Script
-Skyve Script is a new abbreviated way to declare a no-code application – using the markdown standard to allow developers to specify domain models.
+Skyve Script is a new abbreviated way to declare a no-code application - using the markdown standard to allow developers to specify domain models.
 
 #### Quick Overview
 In Skyve Script, a document declaration looks like this:
@@ -39,7 +40,7 @@ Skyve Script supports complex applications, with relationships between documents
 - deliveryAddress Address
 ```
 
-The script for a complete “Organisation Address Book” application module would then be:
+The script for a complete 'Organisation Address Book' application module would then be:
 ```markdown
 # "Organisation Address Book"
 
@@ -65,9 +66,9 @@ The script for a complete “Organisation Address Book” application module wou
 #### Using Skyve Script
 You can use Skyve Script with the Skyve online project creator for a new project, or within an existing Skyve application to create additional documents.
 
-Within an existing Skyve application, the Skyve admin module provides the Document Creator – a user interface for editing Skyve Script. By placing your markdown in the Input tab, the system will preview the markdown and generated document declaration when you change tab. Any errors will be highlighted in red in the Document Preview tab.
+Within an existing Skyve application, the Skyve admin module provides the Document Creator - a user interface for editing Skyve Script. By placing your markdown in the Input tab, the system will preview the markdown and generated document declaration when you change tab. Any errors will be highlighted in red in the Document Preview tab.
 
-The power of Skyve Script is that you can create it anywhere anytime, on your phone, in notepad or on paper. You don’t need a UML modelling application or diagramming tool, but it is sufficient to create a functioning no-code application in Skyve.
+The power of Skyve Script is that you can create it anywhere anytime, on your phone, in notepad or on paper. You don't need a UML modelling application or diagramming tool, but it is sufficient to create a functioning no-code application in Skyve.
 
 While Skyve Script is sophisticated enough to build real no-code applications, it is intended as a rapid development technique and not a replacement for a complete Skyve declaration. While the full Skyve declaration standard supports rich domain models sufficient for enterprise scale, sophisticated mission critical systems, Skyve Script will get you to a functioning no-code application in minutes.
 
@@ -183,7 +184,7 @@ For example:
 The filter has to init parameters:
 
 ```java
-private String realm = “Protected”;
+private String realm = "Protected";
 private String[] unsecuredURLPrefixes;
 ```
 
@@ -216,7 +217,7 @@ Insert this filter and mapping after the other filters:
 Then redploy your app (or restart your app server).
 
 #### Testing end points
-The SessionFilter will allow you to interact with the end points while you have a valid Session, and you'll be redirected to a login page at the first interaction to authenticate. Once you've logged in, you can then exercise the endpoints using your browser. The SessionFilter allows you to make REST calls after initial login that will propagate the remote user onto the REST call’s execution context (the logged in user).
+The SessionFilter will allow you to interact with the end points while you have a valid Session, and you'll be redirected to a login page at the first interaction to authenticate. Once you've logged in, you can then exercise the endpoints using your browser. The SessionFilter allows you to make REST calls after initial login that will propagate the remote user onto the REST call's execution context (the logged in user).
 
 For example:
 
@@ -341,7 +342,7 @@ For example:
 The filter has two init parameters:
 
 ```java
-private String realm = “Protected”;
+private String realm = "Protected";
 private String[] unsecuredURLPrefixes;
 ```
 
@@ -507,7 +508,7 @@ We recommend the following:
 #### Installation of prerequisites
 To run a Skyve application, the server requires:
 
-Java 8 (also called 1.8) – while the JRE is sufficient, the JDK is recommended.
+Java 8 (also called 1.8) - while the JRE is sufficient, the JDK is recommended.
  - Download the Java JDK 8u191 from https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html 
  - These instructions may assist for linux - https://docs.oracle.com/javase/8/docs/technotes/guides/install/linux_jdk.html#BJFGGEFG (though note that this mentions an slightly older version of Java)
 
@@ -519,8 +520,8 @@ Wildfly 10.1.0.Final
 For database access, load the appropriate driver and declare this driver in the Wildfly standalone.xml configuration file.
 
 For example, for SQL Server:
-- load the sqljdbc42.jar into wildfy…/modules/system/layers/base/com/microsoft/sqlserver/main/
-- copy the following definition into a new file  wildfy…/modules/system/layers/base/com/microsoft/sqlserver/main/module.xml
+- load the sqljdbc42.jar into wildfy.../modules/system/layers/base/com/microsoft/sqlserver/main/
+- copy the following definition into a new file  wildfy.../modules/system/layers/base/com/microsoft/sqlserver/main/module.xml
 ```
  		<?xml version="1.0" encoding="utf-8"?> 
 			<module xmlns="urn:jboss:module:1.3" name="com.microsoft.sqlserver"> 
@@ -598,5 +599,77 @@ If the server has multiple Skyve application deployments, you can replace one of
 To undeploy, create an '.undeploy' file in the wildfly/standalone/deployment/ folder corresponding to the name of your application (an empty text file with that name is all that is required), for example 'helloworld.undeploy'. After approximately 30s, wildlfly will replace this file with a file named 'helloworld.undeployed'. 
 
 To redeploy, create a '.dodeploy' file in the wildfly/standalone/deployment/ folder corresponding to the name of your application, for example 'helloworld.dodeploy' (an empty text file with that name is all that is required). After approximately 30s, wildfly will replace this file with 'helloworld.isdeploying' and once deployment is successful, wildfly will replace this with 'helloworld.deployed' (if successful) or 'helloworld.failed' (if unsuccesful).
+
+### Manually seeding new customer users
+
+#### Creating the customer scope
+
+Here's how to create another customer to the Skyve demo.zip download example, for example a customer called _acme_:
+1.    Copy the _demo_ customer folder from ```\demo\skyve\src\skyve\customers\demo``` to ```\demo\skyve\src\skyve\customers\acme```
+2.    Rename the file ```\demo\skyve\src\skyve\customers\acme\demo.xml``` to ```\demo\skyve\src\skyve\customers\acme\acme.xml```
+3.    Edit the new file ```\demo\skyve\src\skyve\customers\acme\acme.xml``` and change the customer name value to match - i.e. on line 2 ```<customer name="acme" ... ```
+
+All customisations specific to this customer will live within this customer folder.
+
+#### Deploying the customer
+
+If you're not using a development tool (an IDE like eclipse) and you just want another customer in the demo, then you'll need to copy the customer folder manually to the deployment area, i.e. copy ```\demo\skyve\src\skyve\customers\acme``` to  ```\demo\skyve\javaee\skyve.ear\apps.jar\skyve\customers\acme```
+
+If you're using an IDE like eclipse then this copy will happen automatically.
+
+#### Adding a setup user
+
+However to start creating data within that customer context, you'll need a user credential in the database so that you can log in the first time. There's several ways to do this but the simplest at the moment would be to open up the database and run a script - this will inject a user credential. This is just to get you started. Once you've logged in as this user, you can begin adding more users and data via the user interface.
+
+Now start up the application server, by running _\demo\run.bat_ (or \demo\run.sh if you're not using Windows)
+
+##### Using the h2 database manager
+
+If you're using the demo h2 database, to access the h2 database manager embedded in the demo, browse to ```http://localhost:8080/skyve/h2```
+
+![Signing in](/assets/images/h2_database_manager_sign_in.png "Signing in to the embedded h2 database manager")
+
+Check that the JDBC URL matches the name of the h2 file in the ```\demo\content\``` folder - for the demo, this will be _demo_ - and so the JDBC URL should have the full path, for example  ```jdbc:h2:C:/demo/skyve/content/demo``` (where ```C:/demo/skyve/content/demo``` is the full path to the file _demo.h2.db_ - without the ".h2.db")
+
+##### Inserting the user record
+
+NOTE: You will only ever need this script once - to get started - from that point on you won't need to use SQL again to build, test or maintain your application.
+
+Paste in the following lines into your database manager (modify by replacing _acme_ with your customer name):
+
+ ```
+ INSERT INTO adm_contact (bizId,bizVersion,bizLock,bizCustomer,bizUserId,bizKey,name,mobile,email1,contactType) VALUES 
+ ('setupContact',72,'20080114123937714setup','acme','setup','Setup User','Setup User',NULL,'info@bizhub.com.au','Person');
+
+INSERT INTO adm_securitygroup (bizId,bizVersion,bizLock,bizCustomer,bizUserId,bizKey, name,description) VALUES 
+ ('setupGroup',200,'20080114123937714setup','acme','setup','Setup','Setup','Setup user');
+
+INSERT INTO adm_securitygrouprole (bizId,bizVersion,bizLock,bizCustomer,bizUserId,bizKey, roleName,parent_id) VALUES 
+ ('setupGroupRoleBasic',69,'20080114123937714setup','acme','setup','admin.BasicUser','admin.BasicUser','setupGroup'),
+ ('setupGroupRoleContact',69,'20080114123937714setup','acme','setup','admin.ContactViewer','admin.ContactViewer','setupGroup'),
+ ('setupGroupRoleSecurity',69,'20080114123937714demo','acme','setup','admin.SecurityAdministrator','admin.SecurityAdministrator','setupGroup');
+
+INSERT INTO adm_securityuser (bizId,bizVersion,bizLock,bizCustomer,bizUserId,bizKey, userName,password,contact_id) VALUES 
+ ('setup',57,'20080114123937698setup','acme','setup','setup','setup','0RGzjA5zvIZ8S61AI2BqDg32TC8=','setupContact');
+
+INSERT INTO adm_securityuser_groups (owner_id,element_id) VALUES  ('setup','setupGroup');
+ ```
+ 
+ ![Using h2](/assets/images/h2_database_manager.png "Using the h2 database manager")
+ 
+NOTE: This script assumes the SHA1 password hashing algorithm. If you're using something else, you'll need to swap the value _'0RGzjA5zvIZ8S61AI2BqDg32TC8='_ for the encrypted value using that algorithm.
+
+The above script can be trivially modified if you're using an RDBMS other than h2.
+
+Run the script, then browse to the application at ```localhost:8080\skyve```
+
+Now you can log in as the setup user in the new customer _acme_ - with the following credentials:
+
+- Customer _acme_
+- Username _setup_
+- Password _password01_
+
+![Customer sign in](/assets/images/skyve_customer_sign_in.png "Skyve customer sign in")
+
 
 **[⬆ back to top](#contents)**
