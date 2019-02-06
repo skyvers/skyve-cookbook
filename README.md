@@ -9,6 +9,7 @@ Examples and code samples for using the [Skyve](http://skyve.org/) framework.
   * [Heap space errors](heap-space-errors)
 * [Creating Rest Services](#creating-rest-services)
 * [Understanding Skyve Rest](#understanding-skyve-rest)
+* [Adding Swagger Documentation to your REST API](#adding-swagger-documentation-to-your-rest-api)
 * [Problems with utf8 - character sets for other languages - MySQL](#problems-with-utf8---character-sets-for-other-languages---mysql)
 * [Customer Scoped Roles](#customer-scoped-roles)
 * [SAIL Automated UI Tests](#sail-automated-ui-tests)
@@ -409,6 +410,138 @@ You will also need to update `src/main/webapp/WEB-INF/spring/security.xml` to al
 #### Other Resources
 https://github.com/skyvers/skyve/tree/master/skyve-web/src/main/java/org/skyve/impl/web/service/rest
 https://github.com/skyvers/skyve/blob/master/skyve-ee/src/test/org/skyve/impl/web/filter/rest/BasicAuthIT.java
+
+**[⬆ back to top](#contents)**
+
+### Adding Swagger Documentation to your REST API
+
+[Swagger](https://swagger.io/) is a documentation framework for REST APIs which allows external developers to explore your API and interact with your application. Swagger API definitions can be created manually, but it also provides libraries to automatically generate an API definition from annotations on your REST controllers.
+
+If you are defining your own API endpoints for your Skyve application, the following setup can be used to integrate Swagger to parse your API and be available in your Skyve project (_requires Skyve version >= 2019..._).
+
+#### Define the API Path
+
+Create a class `JaxRsActivator.java` (can be called anything, e.g. MyApplication). Swagger requires a configuration file for basic API information, which packages to scan for endpoints, etc. This can either be supplied in an external file, or created programatically. The `JaxRsActivator` below will load a defined `openapi.yaml` file in the root of your content specified in your JSON (so it can be different per server environment), or it will build it programatically if it is not found in the content directory.
+
+After you create the file, the following needs to be customised:
+* your path to your API in the `@ApplicationPath` annotation
+* your class names of your REST API controllers in `getClasses()`
+* if using the programmatic Swagger configuration in `buildProgrammaticContext()`, provide the API information and the package to your REST controller classes
+
+```java
+@ApplicationPath("/api")
+public class JaxRsActivator extends Application {
+
+	public JaxRsActivator(@Context ServletConfig servletConfig) {
+		super();
+		
+		SwaggerConfiguration oasConfig = buildProgrammaticContext();
+
+		try {
+			// check to see if there is a config defined in the content directory
+			Path contextPath = Paths.get(Util.getContentDirectory(), "openapi.yaml");
+			if (contextPath.toFile().exists()) {
+				new JaxrsOpenApiContextBuilder()
+						.configLocation(contextPath.toFile().toString())
+						.buildContext(true);
+			} else {
+				buildProgrammaticContext();
+				new JaxrsOpenApiContextBuilder()
+						.servletConfig(servletConfig)
+						.application(this)
+						.openApiConfiguration(oasConfig)
+						.buildContext(true);
+			}
+		} catch (OpenApiConfigurationException e) {
+			throw new RuntimeException(e.getMessage(), e);
+		}
+	}
+
+    /**
+     * This tells Java to scan and load these classes against the application path
+     * defined on the path. This is required for all controllers even without Swagger.
+     */
+	@Override
+	public Set<Class<?>> getClasses() {
+		return Stream
+				.of(MyRestController1.class, // add each of your controller classes here
+						MyRestController2.class,
+						OpenApiResource.class, // required for swagger
+						AcceptHeaderOpenApiResource.class) // required for swagger
+				.collect(Collectors.toSet());
+	}
+
+	private SwaggerConfiguration buildProgrammaticContext() {		
+		OpenAPI oas = new OpenAPI();
+		Info info = new Info()
+				.title("API title")
+				.description("API description.\n\nThis can contain markdown.")
+				// .termsOfService("http://swagger.io/terms/")
+				.contact(new Contact()
+						.email("info@skyve.org"))
+				.version("1.0");
+                /*.license(new License()
+                        .name("Apache 2.0")
+                        .url("http://www.apache.org/licenses/LICENSE-2.0.html"));*/
+
+		oas.info(info);
+
+		Server server = new Server();
+		server.setUrl(Util.getSkyveContextUrl());
+		oas.addServersItem(server);
+
+		SwaggerConfiguration oasConfig = new SwaggerConfiguration()
+				.openAPI(oas)
+				.prettyPrint(Boolean.TRUE)
+				.resourcePackages(Stream.of("package.to.my.api.controllers").collect(Collectors.toSet()));
+		return oasConfig;
+	}
+}
+```
+
+#### Update Spring security
+
+Open the `WEB-INF/spring/security.xml` file for your project.
+
+Add this above the `<!-- Secure everything else -->` block to allow Spring to not intercept basic authentication request to your API endpoint. Change the pattern if you modified it in your JaxRxActivator class.
+
+```xml
+	<!-- do not secure the API, as this is secured by the BasicAuth servlet -->
+	<http auto-config="true" use-expressions="true" security="none" pattern="/api/**" />
+```
+
+#### Update web.xml
+
+Open the `WEB-INF/web.xml` file for your project.
+
+**Enable the Documentation Servlet**
+
+Skyve provides an xhtml page which creates loads the Swagger UI client application. To make this more convenient to customers (e.g. instead of typing `{applicationUrl}/swagger/swagger.xhtml` into their browser), Skyve provides a documentation servlet.
+
+Open your project's `web.xml` and uncomment the `DocsServlet` definition. The docsPath `<init-param>` tells the servlet where to forward to, and the `<url-pattern>` defines the URL for the servlet. So by default, accessing `/docs` will forward to `/swagger/swagger.xhtml` and load Swagger UI.
+
+**Turn on the BasicAuthFilter for your API URL**
+
+Add the following below the `DocsServlet` definition and customise it with the path to your API.
+
+```xml
+    <!-- API filter -->
+	<filter>
+		<display-name>BasicAuthFilter</display-name>
+		<filter-name>BasicAuthFilter</filter-name>
+		<filter-class>org.skyve.impl.web.filter.rest.BasicAuthFilter</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>BasicAuthFilter</filter-name>
+		<url-pattern>/api/*</url-pattern>
+	</filter-mapping>
+```
+
+#### Update the pom
+
+Open the `pom.xml` for your project.
+
+In the `<dependencies>` section, uncomment the two dependencies for swagger-jaxrs2 and swagger-ui.
 
 **[⬆ back to top](#contents)**
 
