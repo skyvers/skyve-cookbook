@@ -9,6 +9,7 @@ Examples and code samples for using the [Skyve](http://skyve.org/) framework.
   * [Heap space errors](heap-space-errors)
 * [Creating Rest Services](#creating-rest-services)
 * [Understanding Skyve Rest](#understanding-skyve-rest)
+* [Injecting Custom JavaScript into SmartClient](#injecting-custom-javascript-into-smartclient)
 * [Adding Swagger Documentation to your REST API](#adding-swagger-documentation-to-your-rest-api)
 * [Problems with utf8 - character sets for other languages - MySQL](#problems-with-utf8---character-sets-for-other-languages---mysql)
 * [Customer Scoped Roles](#customer-scoped-roles)
@@ -410,6 +411,95 @@ You will also need to update `src/main/webapp/WEB-INF/spring/security.xml` to al
 #### Other Resources
 https://github.com/skyvers/skyve/tree/master/skyve-web/src/main/java/org/skyve/impl/web/service/rest
 https://github.com/skyvers/skyve/blob/master/skyve-ee/src/test/org/skyve/impl/web/filter/rest/BasicAuthIT.java
+
+**[⬆ back to top](#contents)**
+
+### Injecting Custom JavaScript into SmartClient
+
+It is possible to use third party JavaScript within a Skyve application in certain scenarios, for example to use a custom mapping or charting library. To use this within the power user interface (SmartClient), an `inject` tag is available for this purpose when creating a view for a Document.
+
+The following example creates a hard-coded chart using chartjs. Javascript can be used to retrieve data through Skyve using the built in [REST API](#creating-rest-services), or a custom REST endpoint within the application.
+
+Below is a complete edit.xml for rendering a chart:
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<view xmlns="http://www.skyve.org/xml/view" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="edit" title="Chart Example" xsi:schemaLocation="http://www.skyve.org/xml/view ../../../../schemas/view.xsd">
+    <hbox minPixelHeight="600">
+	    <blurb>
+	    	<![CDATA[
+	    		<h3>My Custom Chart Example</h3>
+	    		<canvas id="myChart"></canvas>
+	    	]]>
+	    </blurb>
+    </hbox>
+    
+    <inject>
+    	<script>
+    		<![CDATA[
+    			// make sure SC has finished rendering the view
+    			view.opened = function(data) {
+    				// make sure the 3rd party script has fully loaded before trying to interact with the dom
+    				isc.BizUtil.loadJS('https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js', function() {
+    					// hard-coded chart example from https://www.chartjs.org/ 
+    					var ctx = document.getElementById("myChart").getContext('2d');
+						var myChart = new Chart(ctx, {
+						    type: 'bar',
+						    data: {
+						        labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+						        datasets: [{
+						            label: '# of Votes',
+						            data: [12, 19, 3, 5, 2, 3],
+						            backgroundColor: [
+						                'rgba(255, 99, 132, 0.2)',
+						                'rgba(54, 162, 235, 0.2)',
+						                'rgba(255, 206, 86, 0.2)',
+						                'rgba(75, 192, 192, 0.2)',
+						                'rgba(153, 102, 255, 0.2)',
+						                'rgba(255, 159, 64, 0.2)'
+						            ],
+						            borderColor: [
+						                'rgba(255,99,132,1)',
+						                'rgba(54, 162, 235, 1)',
+						                'rgba(255, 206, 86, 1)',
+						                'rgba(75, 192, 192, 1)',
+						                'rgba(153, 102, 255, 1)',
+						                'rgba(255, 159, 64, 1)'
+						            ],
+						            borderWidth: 1
+						        }]
+						    }
+						});
+	    				
+						// uncomment to only call this once, will be called each time if commented out
+						// view.opened = function() {};
+    				});
+				};
+    		]]>
+    	</script>
+    </inject>
+    <actions>
+    	<!-- disable actions unless required -->
+        <!-- <defaults/> -->
+    </actions>
+</view>
+```
+
+In the above example, we use a `blurb` tag to output some custom HTML onto the page, which gives us our Canvas chartjs requires. There are other methods to obtain a reference to the hbox and then programatically add the canvas, but this is the simplest example.
+
+The `inject` tag then adds our custom javascript to the page. To make sure that the page has loaded and been fully drawn by the browser, we use two callbacks in the javascript:
+
+```javascript
+view.opened = function(data) {
+```
+
+This is called back when SmartClient has finished parsing the JSON from the server and rendering the components of the view.
+
+```javascript
+isc.BizUtil.loadJS('https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js', function() {
+```
+
+This is called after the chartjs library has been downloaded. Multiple `loadJS` callbacks can be nested inside each other if multiple scripts are required for the page.
 
 **[⬆ back to top](#contents)**
 
