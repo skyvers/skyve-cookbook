@@ -263,7 +263,7 @@ http://localhost:8080/<projectName>/rest/json/admin/Contact/58619c0d-496b-49e6-9
 Note that the id matches the bizId in the prior example, and that the entire Contact object is now retrieved - not only the fields in the default query. This includes the result of conditions declared in the Contact document.
 
 ```json
- {
+{
   "bizModule":"admin",
   "bizDocument":"Contact",
   "name":"Aaliyah Bowling",
@@ -277,7 +277,7 @@ Note that the id matches the bizId in the prior example, and that the entire Con
   "bizUserId":"bf8cb7c4-5d8a-477b-8b96-15a2bc72364a",
   "bizVersion":5,
   "bizLock":"20170410143341392demo"
- }
+}
 ```
 Note the attributes, bizCustomer, bizModule and bizDocument define the specific entity. When using insert and update endpoints, these attributes specify the entity to be manipulated.
 
@@ -362,13 +362,13 @@ var headers = new Headers();
 headers.append("Authorization", "Basic " + base64.encode("admin:password01"));
 console.log(headers);
 fetch('http://192.168.43.91:8080/<projectName>/rest/json/query/admin/qContacts', {
-headers: headers
+  headers: headers
 })
 .then((response) => {
-console.log('response:',response);
+  console.log('response:',response);
 })
 .catch((error) => {
-console.error("err" + error);
+  console.error("err" + error);
 }
 ```
 
@@ -385,16 +385,16 @@ If this sounds like the scenario you require, to begin using the filter addo the
 
 ```xml
 <filter>
-	<filter-name>RestUserPersistenceFilter</filter-name>
-	<filter-class>org.skyve.impl.web.filter.rest.RestUserPersistenceFilter</filter-class>
-	<init-param>
-		<param-name>PersistenceUser</param-name>
-		<param-value>{restUsername}</param-value>
-	</init-param>
+    <filter-name>RestUserPersistenceFilter</filter-name>
+    <filter-class>org.skyve.impl.web.filter.rest.RestUserPersistenceFilter</filter-class>
+    <init-param>
+        <param-name>PersistenceUser</param-name>
+        <param-value>{restUsername}</param-value>
+    </init-param>
 </filter>
 <filter-mapping>
-	<filter-name>RestUserPersistenceFilter</filter-name>
-	<url-pattern>{restUrlPattern}</url-pattern>
+    <filter-name>RestUserPersistenceFilter</filter-name>
+    <url-pattern>{restUrlPattern}</url-pattern>
 </filter-mapping>
 ```
 
@@ -416,7 +416,7 @@ https://github.com/skyvers/skyve/blob/master/skyve-ee/src/test/org/skyve/impl/we
 
 ### Injecting Custom JavaScript into SmartClient
 
-It is possible to use third party JavaScript within a Skyve application in certain scenarios, for example to use a custom mapping or charting library. To use this within the power user interface (SmartClient), an `inject` tag is available for this purpose when creating a view for a Document.
+It is possible to use third party JavaScript within a Skyve application in certain scenarios, for example to use a custom mapping or charting library. An `<inject>` tag is available for this purpose when creating a view for a Document within the power user interface (SmartClient), 
 
 The following example creates a hard-coded chart using chartjs. Javascript can be used to retrieve data through Skyve using the built in [REST API](#creating-rest-services), or a custom REST endpoint within the application.
 
@@ -425,63 +425,63 @@ Below is a complete edit.xml for rendering a chart:
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <view xmlns="http://www.skyve.org/xml/view" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="edit" title="Chart Example" xsi:schemaLocation="http://www.skyve.org/xml/view ../../../../schemas/view.xsd">
-    <hbox minPixelHeight="600">
-	    <blurb>
-	    	<![CDATA[
-	    		<h3>My Custom Chart Example</h3>
-	    		<canvas id="myChart"></canvas>
-	    	]]>
-	    </blurb>
-    </hbox>
+  <hbox minPixelHeight="600">
+    <blurb>
+      <![CDATA[
+        <h3>My Custom Chart Example</h3>
+        <canvas id="myChart"></canvas>
+      ]]>
+    </blurb>
+  </hbox>
     
-    <inject>
-    	<script>
-    		<![CDATA[
-    			// make sure SC has finished rendering the view
-    			view.opened = function(data) {
-    				// make sure the 3rd party script has fully loaded before trying to interact with the dom
-    				isc.BizUtil.loadJS('https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js', function() {
-    					// hard-coded chart example from https://www.chartjs.org/ 
-    					var ctx = document.getElementById("myChart").getContext('2d');
-						var myChart = new Chart(ctx, {
-						    type: 'bar',
-						    data: {
-						        labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-						        datasets: [{
-						            label: '# of Votes',
-						            data: [12, 19, 3, 5, 2, 3],
-						            backgroundColor: [
-						                'rgba(255, 99, 132, 0.2)',
-						                'rgba(54, 162, 235, 0.2)',
-						                'rgba(255, 206, 86, 0.2)',
-						                'rgba(75, 192, 192, 0.2)',
-						                'rgba(153, 102, 255, 0.2)',
-						                'rgba(255, 159, 64, 0.2)'
-						            ],
-						            borderColor: [
-						                'rgba(255,99,132,1)',
-						                'rgba(54, 162, 235, 1)',
-						                'rgba(255, 206, 86, 1)',
-						                'rgba(75, 192, 192, 1)',
-						                'rgba(153, 102, 255, 1)',
-						                'rgba(255, 159, 64, 1)'
-						            ],
-						            borderWidth: 1
-						        }]
-						    }
-						});
-	    				
-						// uncomment to only call this once, will be called each time if commented out
-						// view.opened = function() {};
-    				});
-				};
-    		]]>
-    	</script>
-    </inject>
-    <actions>
-    	<!-- disable actions unless required -->
-        <!-- <defaults/> -->
-    </actions>
+  <inject>
+    <script>
+      <![CDATA[
+        // make sure SC has finished rendering the view
+        view.opened = function(data) {
+          // make sure the 3rd party script has fully loaded before trying to interact with the dom
+          isc.BizUtil.loadJS('https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.min.js', function() {
+            // hard-coded chart example from https://www.chartjs.org/ 
+            var ctx = document.getElementById("myChart").getContext('2d');
+            var myChart = new Chart(ctx, {
+              type: 'bar',
+              data: {
+                labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
+                datasets: [{
+                  label: '# of Votes',
+                  data: [12, 19, 3, 5, 2, 3],
+                  backgroundColor: [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                  ],
+                  borderColor: [
+                    'rgba(255,99,132,1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                  ],
+                  borderWidth: 1
+                }]
+              }
+            });
+            
+            // uncomment to only call this once, will be called each time if commented out
+            // view.opened = function() {};
+          });
+        };
+      ]]>
+    </script>
+  </inject>
+  <actions>
+      <!-- disable actions unless required -->
+      <!-- <defaults/> -->
+  </actions>
 </view>
 ```
 
@@ -501,13 +501,15 @@ isc.BizUtil.loadJS('https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.
 
 This is called after the chartjs library has been downloaded. Multiple `loadJS` callbacks can be nested inside each other if multiple scripts are required for the page.
 
+Another example of injecting custom javascript can be found in the [Office edit view](https://github.com/skyvers/skyve/blob/master/skyve-ee/src/skyve/modules/whosinIntegrate/Office/views/edit.xml) in the whosinintegrate module of Skyve-ee. This manupulates the existing view to create a new button which opens an `iframe` in a Skyve popup window.
+
 **[⬆ back to top](#contents)**
 
 ### Adding Swagger Documentation to your REST API
 
 [Swagger](https://swagger.io/) is a documentation framework for REST APIs which allows external developers to explore your API and interact with your application. Swagger API definitions can be created manually, but it also provides libraries to automatically generate an API definition from annotations on your REST controllers.
 
-If you are defining your own API endpoints for your Skyve application, the following setup can be used to integrate Swagger to parse your API and be available in your Skyve project (_requires Skyve version >= 2019..._).
+If you are defining your own API endpoints for your Skyve application, the following setup can be used to integrate Swagger to parse your API and be available in your Skyve project (_requires Skyve version > 20190201_).
 
 #### Define the API Path
 
@@ -522,70 +524,70 @@ After you create the file, the following needs to be customised:
 @ApplicationPath("/api")
 public class JaxRsActivator extends Application {
 
-	public JaxRsActivator(@Context ServletConfig servletConfig) {
-		super();
-		
-		SwaggerConfiguration oasConfig = buildProgrammaticContext();
+    public JaxRsActivator(@Context ServletConfig servletConfig) {
+        super();
+        
+        SwaggerConfiguration oasConfig = buildProgrammaticContext();
 
-		try {
-			// check to see if there is a config defined in the content directory
-			Path contextPath = Paths.get(Util.getContentDirectory(), "openapi.yaml");
-			if (contextPath.toFile().exists()) {
-				new JaxrsOpenApiContextBuilder()
-						.configLocation(contextPath.toFile().toString())
-						.buildContext(true);
-			} else {
-				buildProgrammaticContext();
-				new JaxrsOpenApiContextBuilder()
-						.servletConfig(servletConfig)
-						.application(this)
-						.openApiConfiguration(oasConfig)
-						.buildContext(true);
-			}
-		} catch (OpenApiConfigurationException e) {
-			throw new RuntimeException(e.getMessage(), e);
-		}
-	}
+        try {
+            // check to see if there is a config defined in the content directory
+            Path contextPath = Paths.get(Util.getContentDirectory(), "openapi.yaml");
+            if (contextPath.toFile().exists()) {
+                new JaxrsOpenApiContextBuilder()
+                        .configLocation(contextPath.toFile().toString())
+                        .buildContext(true);
+            } else {
+                buildProgrammaticContext();
+                new JaxrsOpenApiContextBuilder()
+                        .servletConfig(servletConfig)
+                        .application(this)
+                        .openApiConfiguration(oasConfig)
+                        .buildContext(true);
+            }
+        } catch (OpenApiConfigurationException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
 
     /**
      * This tells Java to scan and load these classes against the application path
      * defined on the path. This is required for all controllers even without Swagger.
      */
-	@Override
-	public Set<Class<?>> getClasses() {
-		return Stream
-				.of(MyRestController1.class, // add each of your controller classes here
-						MyRestController2.class,
-						OpenApiResource.class, // required for swagger
-						AcceptHeaderOpenApiResource.class) // required for swagger
-				.collect(Collectors.toSet());
-	}
+    @Override
+    public Set<Class<?>> getClasses() {
+        return Stream
+                .of(MyRestController1.class, // add each of your controller classes here
+                        MyRestController2.class,
+                        OpenApiResource.class, // required for swagger
+                        AcceptHeaderOpenApiResource.class) // required for swagger
+                .collect(Collectors.toSet());
+    }
 
-	private SwaggerConfiguration buildProgrammaticContext() {		
-		OpenAPI oas = new OpenAPI();
-		Info info = new Info()
-				.title("API title")
-				.description("API description.\n\nThis can contain markdown.")
-				// .termsOfService("http://swagger.io/terms/")
-				.contact(new Contact()
-						.email("info@skyve.org"))
-				.version("1.0");
+    private SwaggerConfiguration buildProgrammaticContext() {		
+        OpenAPI oas = new OpenAPI();
+        Info info = new Info()
+                .title("API title")
+                .description("API description.\n\nThis can contain markdown.")
+                // .termsOfService("http://swagger.io/terms/")
+                .contact(new Contact()
+                        .email("info@skyve.org"))
+                .version("1.0");
                 /*.license(new License()
                         .name("Apache 2.0")
                         .url("http://www.apache.org/licenses/LICENSE-2.0.html"));*/
 
-		oas.info(info);
+        oas.info(info);
 
-		Server server = new Server();
-		server.setUrl(Util.getSkyveContextUrl());
-		oas.addServersItem(server);
+        Server server = new Server();
+        server.setUrl(Util.getSkyveContextUrl());
+        oas.addServersItem(server);
 
-		SwaggerConfiguration oasConfig = new SwaggerConfiguration()
-				.openAPI(oas)
-				.prettyPrint(Boolean.TRUE)
-				.resourcePackages(Stream.of("package.to.my.api.controllers").collect(Collectors.toSet()));
-		return oasConfig;
-	}
+        SwaggerConfiguration oasConfig = new SwaggerConfiguration()
+                .openAPI(oas)
+                .prettyPrint(Boolean.TRUE)
+                .resourcePackages(Stream.of("package.to.my.api.controllers").collect(Collectors.toSet()));
+        return oasConfig;
+    }
 }
 ```
 
@@ -596,8 +598,8 @@ Open the `WEB-INF/spring/security.xml` file for your project.
 Add this above the `<!-- Secure everything else -->` block to allow Spring to not intercept basic authentication request to your API endpoint. Change the pattern if you modified it in your JaxRxActivator class.
 
 ```xml
-	<!-- do not secure the API, as this is secured by the BasicAuth servlet -->
-	<http auto-config="true" use-expressions="true" security="none" pattern="/api/**" />
+    <!-- do not secure the API, as this is secured by the BasicAuth servlet -->
+    <http auto-config="true" use-expressions="true" security="none" pattern="/api/**" />
 ```
 
 #### Update web.xml
@@ -616,15 +618,15 @@ Add the following below the `DocsServlet` definition and customise it with the p
 
 ```xml
     <!-- API filter -->
-	<filter>
-		<display-name>BasicAuthFilter</display-name>
-		<filter-name>BasicAuthFilter</filter-name>
-		<filter-class>org.skyve.impl.web.filter.rest.BasicAuthFilter</filter-class>
-	</filter>
-	<filter-mapping>
-		<filter-name>BasicAuthFilter</filter-name>
-		<url-pattern>/api/*</url-pattern>
-	</filter-mapping>
+    <filter>
+        <display-name>BasicAuthFilter</display-name>
+        <filter-name>BasicAuthFilter</filter-name>
+        <filter-class>org.skyve.impl.web.filter.rest.BasicAuthFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>BasicAuthFilter</filter-name>
+        <url-pattern>/api/*</url-pattern>
+    </filter-mapping>
 ```
 
 #### Update the pom
@@ -688,7 +690,7 @@ Customer roles aggregate only module roles, they cannot reference other customer
 - download the latest chromdriver.exe from http://chromedriver.chromium.org/downloads
 - update src/test/java/sail/admin/AdminSail.java with the location of the downloaded chromedriver (line 12) and the baseUrl (line 17)
 - ensure you have the following dependencies in the project pom.xml
-```
+```xml
        <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-support</artifactId>
@@ -745,37 +747,37 @@ For database access, load the appropriate driver and declare this driver in the 
 For example, for SQL Server:
 - load the sqljdbc42.jar into wildfy.../modules/system/layers/base/com/microsoft/sqlserver/main/
 - copy the following definition into a new file  wildfy.../modules/system/layers/base/com/microsoft/sqlserver/main/module.xml
-```
- 		<?xml version="1.0" encoding="utf-8"?> 
-			<module xmlns="urn:jboss:module:1.3" name="com.microsoft.sqlserver"> 
-  			<resources> 
-    				<resource-root path="sqljdbc42.jar"/> 
-  			</resources> 
-  			<dependencies> 
-    				<module name="javax.api"/> 
-    				<module name="javax.transaction.api"/>
-				<module name="javax.xml.bind.api"/>
-  			</dependencies> 
-		</module>
+```xml
+<?xml version="1.0" encoding="utf-8"?> 
+  <module xmlns="urn:jboss:module:1.3" name="com.microsoft.sqlserver"> 
+    <resources> 
+      <resource-root path="sqljdbc42.jar"/> 
+    </resources> 
+    <dependencies> 
+      <module name="javax.api"/> 
+      <module name="javax.transaction.api"/>
+      <module name="javax.xml.bind.api"/>
+    </dependencies> 
+  </module>
 ```
 
 - declare the driver in the wildfly configuration file wildfly/standalone/configuration/standalone.xml <drivers> stanza as follows:
 ```
-		<driver name="sqlserver" module="com.microsoft.sqlserver">
-                        <xa-datasource-class>com.microsoft.sqlserver.jdbc.SQLServerXADataSource</xa-datasource-class>
-                </driver>
+  <driver name="sqlserver" module="com.microsoft.sqlserver">
+    <xa-datasource-class>com.microsoft.sqlserver.jdbc.SQLServerXADataSource</xa-datasource-class>
+  </driver>
 ```
 
 #### Configuring ports
 To configure which ports will be used for accessing the application, modify the <socket-binding-group> section in the wildfly configuration file wildfly/standalone/configuration/standalone.xml for http and https:
-```
-        <socket-binding name="http" port="${jboss.http.port:8080}"/>
-        <socket-binding name="https" port="${jboss.https.port:8443}"/>
+```xml
+  <socket-binding name="http" port="${jboss.http.port:8080}"/>
+  <socket-binding name="https" port="${jboss.https.port:8443}"/>
 ````
 For example, for external access, typically you would assign as follows:
-```
-	<socket-binding name="http" port="${jboss.http.port:80}"/>
-        <socket-binding name="https" port="${jboss.https.port:443}"/>
+```xml
+  <socket-binding name="http" port="${jboss.http.port:80}"/>
+  <socket-binding name="https" port="${jboss.https.port:443}"/>
 ```
 
 #### Create a folder for content
