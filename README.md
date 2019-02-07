@@ -11,7 +11,6 @@ Examples and code samples for using the [Skyve](http://skyve.org/) framework.
 * [Understanding Skyve Rest](#understanding-skyve-rest)
 * [Injecting Custom JavaScript into SmartClient](#injecting-custom-javascript-into-smartclient)
 * [Adding Swagger Documentation to your REST API](#adding-swagger-documentation-to-your-rest-api)
-* [Problems with utf8 - character sets for other languages - MySQL](#problems-with-utf8---character-sets-for-other-languages---mysql)
 * [Customer Scoped Roles](#customer-scoped-roles)
 * [SAIL Automated UI Tests](#sail-automated-ui-tests)
 * [Setting up a Skyve instance](#setting-up-a-skyve-instance)
@@ -637,26 +636,7 @@ In the `<dependencies>` section, uncomment the two dependencies for swagger-jaxr
 
 **[⬆ back to top](#contents)**
 
-### Problems with utf8 - character sets for other languages - MySQL
-If your Skyve application is not storing utf8 chars correctly, and you're using MySQL, check that MySQL is configured for utf8. Check the charset of the DB and tables, e.g. the default  is 'latin1'.
 
-In the my.cnf file (for MySQL), check that you have the following:
-```
-[client]
-default-character-set=utf8
-
-[mysql]
-default-character-set=utf8
-
-[mysqld]
-collation-server = utf8_unicode_ci
-init-connect='SET NAMES utf8'
-character-set-server = utf8
-```
-
-To keep an existing database once this change has been made, export the schema from MySQL workbench, use text edit change latin1 to utf8, then drop your schema and import the edited one.
-
-If you don't need to keep existing data, then after the my.cnf changes above, drop your schema, create a new one, then use Skyve bootstrap (in the json settings file) to log in and let Skyve create the new schema for you.
 
 #### Other Resources
 https://stackoverflow.com/questions/3513773/change-mysql-default-character-set-to-utf-8-in-my-cnf
