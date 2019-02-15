@@ -611,32 +611,88 @@ Skyve provides an xhtml page which creates loads the Swagger UI client applicati
 
 Open your project's `web.xml` and uncomment the `DocsServlet` definition. The docsPath `<init-param>` tells the servlet where to forward to, and the `<url-pattern>` defines the URL for the servlet. So by default, accessing `/docs` will forward to `/swagger/swagger.xhtml` and load Swagger UI.
 
+
+```xml
+<!-- API documentation servlet -->
+<servlet>
+  <servlet-name>DocsServlet</servlet-name>
+  <servlet-class>org.skyve.impl.web.service.DocsServlet</servlet-class>
+  <init-param>
+    <param-name>docsPath</param-name>
+    <param-value>/swagger/swagger.xhtml</param-value>
+  </init-param>
+</servlet>
+<servlet-mapping>
+  <servlet-name>DocsServlet</servlet-name>
+  <url-pattern>/docs</url-pattern>
+</servlet-mapping>
+```
+
 **Turn on the BasicAuthFilter for your API URL**
 
 Add the following below the `DocsServlet` definition and customise it with the path to your API.
 
 ```xml
-    <!-- API filter -->
-    <filter>
-        <display-name>BasicAuthFilter</display-name>
-        <filter-name>BasicAuthFilter</filter-name>
-        <filter-class>org.skyve.impl.web.filter.rest.BasicAuthFilter</filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>BasicAuthFilter</filter-name>
-        <url-pattern>/api/*</url-pattern>
-    </filter-mapping>
+<!-- API filter -->
+<filter>
+    <display-name>BasicAuthFilter</display-name>
+    <filter-name>BasicAuthFilter</filter-name>
+    <filter-class>org.skyve.impl.web.filter.rest.BasicAuthFilter</filter-class>
+</filter>
+<filter-mapping>
+    <filter-name>BasicAuthFilter</filter-name>
+    <url-pattern>/api/*</url-pattern>
+</filter-mapping>
 ```
 
 #### Update the pom
 
 Open the `pom.xml` for your project.
 
-In the `<dependencies>` section, uncomment the two dependencies for swagger-jaxrs2 and swagger-ui.
+In the `<properties>` section, include the version properties for the Swagger dependencies.
+
+```xml
+<jackson.version>2.9.5</jackson.version>
+<swagger.version>2.0.6</swagger.version>
+<swagger-ui.version>3.20.5</swagger-ui.version>
+```
+
+In the `<dependencies>` section, make sure you have the three dependencies for jackson-jaxrs, swagger-jaxrs2 and swagger-ui.
+
+```xml
+<dependency>
+  <groupId>com.fasterxml.jackson.jaxrs</groupId>
+  <artifactId>jackson-jaxrs-json-provider</artifactId>
+  <version>${jackson.version}</version>
+</dependency>
+<dependency>
+  <groupId>io.swagger.core.v3</groupId>
+  <artifactId>swagger-jaxrs2</artifactId>
+  <scope>compile</scope>
+  <version>${swagger.version}</version>
+</dependency>
+<dependency>
+  <groupId>org.webjars</groupId>
+  <artifactId>swagger-ui</artifactId>
+  <version>${swagger-ui.version}</version>
+  <scope>runtime</scope>
+</dependency>
+```
+
+In your `maven-war-plugin` `<plugin>` configuration, add the following `webResource`. This ensures the Swagger.xhtml copies in the swagger UI version from the pom when the project is built.
+
+```xml
+<webResource>
+  <directory>src/main/webapp/swagger</directory>
+  <targetPath>swagger</targetPath>
+  <filtering>true</filtering>
+  <includes>
+    <include>swagger.xhtml</include>
+  </includes>
+</webResource>
+```
 
 **[⬆ back to top](#contents)**
-
-
 
 #### Other Resources
 https://stackoverflow.com/questions/3513773/change-mysql-default-character-set-to-utf-8-in-my-cnf
