@@ -7,6 +7,7 @@ Examples and code samples for using the [Skyve](http://skyve.org/) framework.
 * [Ordering a collection in a data table](#ordering-a-collection-in-a-data-table)
 * [Troubleshooting](#troubleshooting)
   * [Heap space errors](heap-space-errors)
+  * [Null bizVersion errors](null-bizversion-errors)
 * [Creating Rest Services](#creating-rest-services)
 * [Understanding Skyve Rest](#understanding-skyve-rest)
 * [Injecting Custom JavaScript into SmartClient](#injecting-custom-javascript-into-smartclient)
@@ -164,6 +165,18 @@ Caused by: java.lang.OutOfMemoryError: Java heap space
     at org.skyve.impl.util.UtilImpl.readJSONConfig(UtilImpl.java:197)
     at org.skyve.impl.web.SkyveContextListener.contextInitialized(SkyveContextListener.java:60)
 ```
+
+#### Null bizVersion errors
+When attempting to save an object, if you receive an error similar to the following stacktrace:
+
+```
+21:56:12,512 INFO  [org.hibernate.engine.jdbc.batch.internal.AbstractBatchImpl] (DefaultQuartzScheduler_Worker-2) HHH000010: On release of batch it still contained JDBC statements
+21:56:12,517 ERROR [org.hibernate.engine.jdbc.batch.internal.BatchingBatch] (DefaultQuartzScheduler_Worker-2) HHH000315: Exception executing batch [org.h2.jdbc.JdbcBatchUpdateException: NULL not allowed for column "BIZVERSION"; SQL statement:
+```
+
+this can be caused when the persistent strategy of a table has changed. E.g. the document previously had been deployed without a persistent strategy (which creates the bizVersion for that document), and then the strategy is changed to joined, which moves the bizVersion to another table.
+
+If this is the case, you will need to go into your database and manually remove the bizVersion column from the table causing errors, or if using H2, take a backup, delete the H2 file, then boostrap and restore your previous data. The next deploy will DDL the correct columns for the persistent strategy.
 
 **[⬆ back to top](#contents)**
 
