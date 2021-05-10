@@ -890,7 +890,7 @@ To redeploy, create a `.dodeploy` file in the `wildfly/standalone/deployments/` 
 
 ## Extending Skyve
 
-While Skyve attempts to provide as much flexibility as it can to developers out of the box, there are always going to be specific scenarios which require some extra customisation. Because Skyve is an Java Enterprise web application, almost anything which can be done in Java can be added to Skyve.
+While Skyve attempts to provide as much flexibility as it can to developers out of the box, there are always going to be specific scenarios which require some extra customisation. Because Skyve is a Java Enterprise web application, almost anything which can be done in Java can be added to Skyve.
 
 ### Consuming 3rd Party APIs
 
@@ -913,16 +913,17 @@ Contact us on [Slack](https://join.slack.com/t/skyveframework/shared_invite/enQt
 
 While it is possible to add custom controls to the desktop renderer in Skyve, it is more practical to walk through adding a custom widget to the responsive renderer. The following example will walk through creating a custom widget for audio playback.
 
-You will then need to create two Classes (name then what ever you want):
+You will need to create two Classes (name then what ever you want):
 
 ```java
   MyCustomComponentBuilderChain extends ComponentBuilderChain
   MyCustomComponentBuilder extends ResponsiveComponentBuilder
 ```
 
-I would recommend putting them in a “widgets” package in your project src.
+I would recommend putting them in a `widgets` package in your project src.
 
 `MyCustomComponentBuilderChain` class will look like this:
+
 ```java
 public class MyCustomComponentBuilderChain extends ComponentBuilderChain {
 	public MyCustomComponentBuilderChain() {
@@ -951,7 +952,7 @@ public class MyCustomComponentBuilder extends ResponsiveComponentBuilder impleme
 (This is a great template to use for building any type of widget.)
 
 Now go to the `contentLink` for the `edit.xml` where you want the audio player.
-Add the following to your content link where you want your new widget ensure the naming matches that in the `MyCustomComponentBuilder`.
+Add the following to your content link where you want your new widget and ensure the naming matches that in the `MyCustomComponentBuilder`.
 
 ```xml
   <contentLink binding="contentBinding">
