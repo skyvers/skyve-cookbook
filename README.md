@@ -1,7 +1,7 @@
 # Skyve Cookbook
 Examples and code samples for using the [Skyve](http://skyve.org/) framework.
 
-### Contents
+## Contents
 * [Skyve Script](#skyve-script)
 * [Deproxy](#deproxy)
 * [Ordering a collection in a data table](#ordering-a-collection-in-a-data-table)
@@ -15,12 +15,14 @@ Examples and code samples for using the [Skyve](http://skyve.org/) framework.
 * [Customer Scoped Roles](#customer-scoped-roles)
 * [SAIL Automated UI Tests](#sail-automated-ui-tests)
 * [Setting up a Skyve instance](#setting-up-a-skyve-instance)
-* [Manually seeding new customer users](#manually-seeding-new-customer-users)
+* [Extending Skyve](#extending-skyve)
+  * [Consuming 3rd Party APIs](#consuming-3rd-party-apis)
+  * [Creating Custom Widgets](#creating-custom-widgets)
 
-### Skyve Script
+## Skyve Script
 Skyve Script is a new abbreviated way to declare a no-code application - using the markdown standard to allow developers to specify domain models.
 
-#### Quick Overview
+### Quick Overview
 In Skyve Script, a document declaration looks like this:
 ```markdown
 ## Address `MDL_Address`
@@ -65,7 +67,7 @@ The script for a complete 'Organisation Address Book' application module would t
 - deliveryAddress Address
 ```
 
-#### Using Skyve Script
+### Using Skyve Script
 You can use Skyve Script with the Skyve online project creator for a new project, or within an existing Skyve application to create additional documents.
 
 Within an existing Skyve application, the Skyve admin module provides the Document Creator - a user interface for editing Skyve Script. By placing your markdown in the Input tab, the system will preview the markdown and generated document declaration when you change tab. Any errors will be highlighted in red in the Document Preview tab.
@@ -74,7 +76,7 @@ The power of Skyve Script is that you can create it anywhere anytime, on your ph
 
 While Skyve Script is sophisticated enough to build real no-code applications, it is intended as a rapid development technique and not a replacement for a complete Skyve declaration. While the full Skyve declaration standard supports rich domain models sufficient for enterprise scale, sophisticated mission critical systems, Skyve Script will get you to a functioning no-code application in minutes.
 
-#### Syntax
+### Syntax
 Skyve Script has a few specific syntax requirements it is looking for when generating domain models:
 
 * New modules should be specified with a level 1 heading (#), followed by a space, then the module name in title case
@@ -102,7 +104,7 @@ Skyve Script has a few specific syntax requirements it is looking for when gener
 
 **[⬆ back to top](#contents)**
 
-### Deproxy 
+## Deproxy 
 When to use:
 - performing an `instanceof` fails when operating over subclasses of a document with a persistence strategy of single
 - Skyve logs an error performing a `BindUtil.get()`:
@@ -122,7 +124,7 @@ if (occ instanceof DeviceOccurrence) {
 
 **[⬆ back to top](#contents)**
 
-### Ordering a collection in a data table
+## Ordering a collection in a data table
 Collections can be ordered or unordered, where an ordered collection allows the user to define the sort of items in the list via drag and drop. Ordering on a collection can be enabled by adding the `ordered="true"` attribute to the collection declaration.
 
 Collections can also have a default sorting by specifying the sort columns in the collection declaration in the document:
@@ -135,9 +137,9 @@ Collections can also have a default sorting by specifying the sort columns in th
 
 **[⬆ back to top](#contents)**
 
-### Troubleshooting
+## Troubleshooting
 
-#### Heap space errors
+### Heap space errors
 During startup of the server, if you encounter a `java.lang.OutOfMemoryError: Java heap space`, a possible cause could be an error in your json file which can't be parse correctly. A sample stacktrace of this is below:
 ```
 14:12:51,910 ERROR [org.jboss.msc.service.fail] (ServerService Thread Pool -- 64) MSC000001: Failed to start service jboss.undertow.deployment.default-server.default-host./skyve: org.jboss.msc.service.StartException in service jboss.undertow.deployment.default-server.default-host./skyve: java.lang.OutOfMemoryError: Java heap space
@@ -166,7 +168,7 @@ Caused by: java.lang.OutOfMemoryError: Java heap space
     at org.skyve.impl.web.SkyveContextListener.contextInitialized(SkyveContextListener.java:60)
 ```
 
-#### Null bizVersion errors
+### Null bizVersion errors
 When attempting to save an object, if you receive an error similar to the following stacktrace:
 
 ```
@@ -180,7 +182,7 @@ If this is the case, you will need to go into your database and manually remove 
 
 **[⬆ back to top](#contents)**
 
-### Creating REST Services
+## Creating REST Services
 
 The `BasicAuthFilter` provided in Skyve can be used to allow authentication using a HTTP basic auth header. So a user can make REST requests using their existing credentials, or create a specific API user in Skyve which has permission to the API.
 
@@ -206,7 +208,7 @@ The realm is used when an unauthorised response is sent, it is an arbitrary valu
 The unsecured URL prefixes allows you to create exceptions that will not be secured by the filter.
 Its similar in use to SkyveFacesFilter in web.xml (the URL prefixes are separated by a newline).
 
-### Understanding Skyve Rest 
+## Understanding Skyve Rest 
 Skyve provides a number of Rest endpoints to support whatever application you build.
 
 However to use these you will require a knowledge of Rest and web filters. An integration test is available at [BasicAuthIT.java](https://github.com/skyvers/skyve/blob/master/skyve-ee/src/test/org/skyve/impl/web/filter/rest/BasicAuthIT.java).
@@ -214,7 +216,7 @@ However to use these you will require a knowledge of Rest and web filters. An in
 You can  trial the endpoints in your browser to gain an understanding of how they work, before you begin coding interactions. To trial the endpoints, you'll need to edit the web.xml which is located in your project at:
 `/src/main/webapp/WEB-INF/web.xml`
 
-#### Configuring The Session Filter
+### Configuring The Session Filter
 Insert this filter and mapping after the other filters:
 ```xml
 <filter>
@@ -230,7 +232,7 @@ Insert this filter and mapping after the other filters:
 
 Then redploy your app (or restart your app server).
 
-#### Testing end points
+### Testing end points
 The SessionFilter will allow you to interact with the end points while you have a valid Session, and you'll be redirected to a login page at the first interaction to authenticate. Once you've logged in, you can then exercise the endpoints using your browser. The SessionFilter allows you to make REST calls after initial login that will propagate the remote user onto the REST call's execution context (the logged in user).
 
 For example:
@@ -323,7 +325,7 @@ curl -X POST -H "Content-Type: application/json" -d '{"bizModule":"admin","bizDo
 ```
 _Note: on Windows, you will need to use double quotes instead of single quotes around the JSON, and escape the double quotes with a backslash, e.g. "{\"created\":true. This can also be performed as a GET request if the JSON is properly escaped._
 
-#### Using the BasicAuthFilter
+### Using the BasicAuthFilter
 When you're ready to start coding comment out the following in your `web.xml`:
 
 ```xml
@@ -362,12 +364,12 @@ private String[] unsecuredURLPrefixes;
 
 The realm is used when an unauthorised response is sent (it is an arbitrary value). The unsecured URL prefixes allows you to create exceptions that will not be secured by the filter. For comparison, review the SkyveFacesFilter in web.xml (the URL prefixes are separated by a newline).
 
-#### Example (CURL)
+### Example (CURL)
 ```bash
 curl --user name:password http://192.168.43.91:8080/<projectName>/rest/json/query/admin/qContacts
 ```
 
-#### Example (React)
+### Example (React)
 ```javascript
 const base64 = require('base-64');
 var headers = new Headers();
@@ -384,7 +386,7 @@ fetch('http://192.168.43.91:8080/<projectName>/rest/json/query/admin/qContacts',
 }
 ```
 
-#### Using the RestUserPersistenceFilter
+### Using the RestUserPersistenceFilter
 If your REST API:
 
 - does not use basic authentication
@@ -420,13 +422,13 @@ You will also need to update `src/main/webapp/WEB-INF/spring/security.xml` to al
 <intercept-url pattern="{restUrlPattern}" access="permitAll" method="POST" />
 ```
 
-#### Other Resources
+### Other Resources
 https://github.com/skyvers/skyve/tree/master/skyve-web/src/main/java/org/skyve/impl/web/service/rest
 https://github.com/skyvers/skyve/blob/master/skyve-ee/src/test/org/skyve/impl/web/filter/rest/BasicAuthIT.java
 
 **[⬆ back to top](#contents)**
 
-### Injecting Custom JavaScript into SmartClient
+## Injecting Custom JavaScript into SmartClient
 
 It is possible to use third party JavaScript within a Skyve application in certain scenarios, for example to use a custom mapping or charting library. An `<inject>` tag is available for this purpose when creating a view for a Document within the power user interface (SmartClient), 
 
@@ -517,13 +519,13 @@ Another example of injecting custom javascript can be found in the [Office edit 
 
 **[⬆ back to top](#contents)**
 
-### Adding Swagger Documentation to your REST API
+## Adding Swagger Documentation to your REST API
 
 [Swagger](https://swagger.io/) is a documentation framework for REST APIs which allows external developers to explore your API and interact with your application. Swagger API definitions can be created manually, but it also provides libraries to automatically generate an API definition from annotations on your REST controllers.
 
 If you are defining your own API endpoints for your Skyve application, the following setup can be used to integrate Swagger to parse your API and be available in your Skyve project (_requires Skyve version > 20190201_).
 
-#### Define the API Path
+### Define the API Path
 
 Create a class `JaxRsActivator.java` (can be called anything, e.g. MyApplication). Swagger requires a configuration file for basic API information, which packages to scan for endpoints, etc. This can either be supplied in an external file, or created programatically. The `JaxRsActivator` below will load a defined `openapi.yaml` file in the root of your content specified in your JSON (so it can be different per server environment), or it will build it programatically if it is not found in the content directory.
 
@@ -603,7 +605,7 @@ public class JaxRsActivator extends Application {
 }
 ```
 
-#### Update Spring security
+### Update Spring security
 
 Open the `WEB-INF/spring/security.xml` file for your project.
 
@@ -614,7 +616,7 @@ Add this above the `<!-- Secure everything else -->` block to allow Spring to no
     <http auto-config="true" use-expressions="true" security="none" pattern="/api/**" />
 ```
 
-#### Update web.xml
+### Update web.xml
 
 Open the `WEB-INF/web.xml` file for your project.
 
@@ -658,7 +660,7 @@ Add the following below the `DocsServlet` definition and customise it with the p
 </filter-mapping>
 ```
 
-#### Update the pom
+### Update the pom
 
 Open the `pom.xml` for your project.
 
@@ -707,12 +709,12 @@ In your `maven-war-plugin` `<plugin>` configuration, add the following `webResou
 
 **[⬆ back to top](#contents)**
 
-#### Other Resources
+### Other Resources
 https://stackoverflow.com/questions/3513773/change-mysql-default-character-set-to-utf-8-in-my-cnf
 
 **[⬆ back to top](#contents)**
 
-### Customer Scoped Roles
+## Customer Scoped Roles
 
 While Groups and Roles allow user permissions to be managed at the _module_ level, some applications have permissions which span multiple modules and the permissions need a way to be linked to function correctly (e.g. a user may have incomplete access to application features if module permissions were not correctly applied to their account). To address this, a customer scoped role can be defined in the `customer.xml` which allows roles to be aggregated together into something coherent and cross module.
 
@@ -735,7 +737,7 @@ The `allowModuleRoles` property controls whether the module roles show up in the
 
 Customer roles aggregate only module roles, they cannot reference other customer roles. Groups can be used to aggregate either module rules or customer roles (if enabled by `allowModuleRoles`).
 
-### SAIL Automated UI Tests
+## SAIL Automated UI Tests
 - download the latest chromdriver.exe from http://chromedriver.chromium.org/downloads
 - update src/test/java/sail/admin/AdminSail.java with the location of the downloaded chromedriver (line 12) and the baseUrl (line 17)
 - ensure you have the following dependencies in the project pom.xml
@@ -770,28 +772,28 @@ Customer roles aggregate only module roles, they cannot reference other customer
 - start wildfly server and deploy project
 - right-click AdminFunctionSail and run as JUnit- browser should fire up and tests should begin
 
-### Setting up a Skyve instance
+## Setting up a Skyve instance
 
-#### Recommended requirements 
+### Recommended requirements 
 We recommend the following:
 - 4GB RAM for Linux and 8GB RAM for Windows
-- Java JDK 8u191 (this is the JDK for Java 8)
-- Wildfly Wildfly 10.1.0.Final
+- Java Open JDK 11 (this is the JDK for Java 11)
+- Wildfly Wildfly 23.0.2.Final (Jakarta EE Full & Web Distribution, not the WildFly Preview EE 9 Distribution)
 - Disk space requirements depend on the nature of the application especially if the database and content repository are located on the same drive, however, for most common applications, 50GB drive space will probably be sufficient.
 
-#### Installation of prerequisites
+### Installation of prerequisites
 To run a Skyve application, the server requires:
 
-Java 8 (also called 1.8) - while the JRE is sufficient, the JDK is recommended.
- - Download the Java JDK 8u191 from https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html 
- - These instructions may assist for linux - https://docs.oracle.com/javase/8/docs/technotes/guides/install/linux_jdk.html#BJFGGEFG (though note that this mentions an slightly older version of Java)
+Java 11 - while the JRE is sufficient, the JDK is recommended.
+ - Download the Java JDK 8u191 from https://adoptopenjdk.net/installation.html?variant=openjdk11&jvmVariant=hotspot#x86-32_win-jdk 
 
-Wildfly 10.1.0.Final 
+Wildfly 23.0.2.Final 
  - Download from http://wildfly.org/downloads/   
  - This link may assist - https://linuxtechlab.com/wildfly-10-10-1-0-installation/ 
 
-#### Installing database driver
-For database access, load the appropriate driver and declare this driver in the Wildfly standalone.xml configuration file.
+### Installing database driver
+
+For database access, load the appropriate driver and declare this driver in the Wildfly standalone.xml configuration file. If using the provided H2 database, the driver is already provided.
 
 For example, for SQL Server:
 - load the sqljdbc42.jar into wildfy.../modules/system/layers/base/com/microsoft/sqlserver/main/
@@ -817,132 +819,189 @@ For example, for SQL Server:
   </driver>
 ```
 
-#### Configuring ports
+### Configuring ports
+
 To configure which ports will be used for accessing the application, modify the <socket-binding-group> section in the wildfly configuration file wildfly/standalone/configuration/standalone.xml for http and https:
+
 ```xml
   <socket-binding name="http" port="${jboss.http.port:8080}"/>
   <socket-binding name="https" port="${jboss.https.port:8443}"/>
 ````
+
 For example, for external access, typically you would assign as follows:
+
 ```xml
   <socket-binding name="http" port="${jboss.http.port:80}"/>
   <socket-binding name="https" port="${jboss.https.port:443}"/>
 ```
 
-#### Create a folder for content
-Skyve includes the elastic content repository - the repository requires a dedicated folder to persist files. The user credential running wildfly (for example) will need read-write permissions to this folder.
+### Create a folder for content
 
-#### Install the wildfly service
-So that the Skyve application will be always available, install the wildfly service, ensuring that the service will have read/write access to the content folder.
+Skyve includes a content repository - the repository requires a dedicated folder to persist files. The user credential running wildfly (for example) will need read-write permissions to this folder.
+
+As of Skyve 7+, an `addins` directory must also be present inside the content directory with the `skyve-content.zip` if using the bundled Skyve content addin, and not a third party content repository.
+
+### Install the wildfly service
+
+So that the Skyve application will be always available, install Wildfly as a service, ensuring that the service will have read/write access to the content folder. Wildfly can also be installed as a service on Windows server.
+
 The following may be useful for linux installations - https://community.i2b2.org/wiki/display/getstarted/2.4.2.3+Run+Wildfly+as+a+Linux+Service
 
-#### Skyve application configuration
+### Skyve application configuration
+
 To deploy a Skyve application, there are typically three artefacts:
-- the application '.war' folder
-- the datasource 'ds.xml' file
-- the properties '.json' file
+- the application `.war` folder
+- the datasource `ds.xml` file
+- the properties `.json` file
 
 For example, if your Skyve application is called 'helloworld', these will be:
-- 'helloworld.war'
-- 'helloworld-ds.xml'
-- 'helloworld.json'
+- `helloworld.war`
+- `helloworld-ds.xml`
+- `helloworld.json`
 
-The 'ds.xml' and '.json' remain on the server you are deploying to, and are customised for that specific instance, so that when you are  deploying a new version of your Skyve application, the instance settings do not need to be adjusted.
+The `ds.xml` and `.json` remain on the server you are deploying to, and are customised for that specific instance, so that when you are  deploying a new version of your Skyve application, the instance settings do not need to be adjusted.
 
-When deploying the Skyve application web archive 'war', ensure that matching configuration settings are updated in the associated 'ds.xml' and '.json' configuration files. 
+When deploying the Skyve application web archive `war`, ensure that matching configuration settings are updated in the associated `ds.xml` and `.json` configuration files. 
 
-Ensure the 'ds.xml' file uses a connection string and credentials corresponding to the setting for the database driver above
+Ensure the `ds.xml` file uses a connection string and credentials corresponding to the setting for the database driver above.
 
-Ensure the '.json' properties file has been updated for the specific instance including:
-- content directory
-- smtp settings
+Ensure the `.json` properties file has been updated for the specific instance including:
+- content and addins directories
+- smtp (mail) settings
 - context url
 - maps and other api keys
 - environment identifier
+- bootstrap settings
 
 Finally, ensure that the user credential that will run the wildfly service has read/write permissions to the wildfly folder and the content folder created above.
 
-#### Deploying a new version of your Skyve application
+### Deploying a new version of your Skyve application
+
 Once a Skyve application has been successfully deployed, to update your application with a new version:
 - undeploy the previous version or stop the wildfly service
-- replace the application '.war' folder with the new version (remove the old version, copy in the new)
+- replace the application `.war` folder with the new version (remove the old version, copy in the new)
 - deploy the new version or start the wildfly service
 
 If the server has multiple Skyve application deployments, you can replace one of these without impacting on other deployments by signalling an undeployment and deployment as follows:
 
-To undeploy, create an '.undeploy' file in the wildfly/standalone/deployment/ folder corresponding to the name of your application (an empty text file with that name is all that is required), for example 'helloworld.undeploy'. After approximately 30s, wildlfly will replace this file with a file named 'helloworld.undeployed'. 
+To undeploy, create an `.undeploy` file in the `wildfly/standalone/deployments/` folder corresponding to the name of your application (an empty text file with that name is all that is required), for example `helloworld.undeploy`. After approximately 30s, wildlfly will replace this file with a file named `helloworld.undeployed`. 
 
-To redeploy, create a '.dodeploy' file in the wildfly/standalone/deployment/ folder corresponding to the name of your application, for example 'helloworld.dodeploy' (an empty text file with that name is all that is required). After approximately 30s, wildfly will replace this file with 'helloworld.isdeploying' and once deployment is successful, wildfly will replace this with 'helloworld.deployed' (if successful) or 'helloworld.failed' (if unsuccesful).
+To redeploy, create a `.dodeploy` file in the `wildfly/standalone/deployments/` folder corresponding to the name of your application, for example `helloworld.dodeploy` (an empty text file with that name is all that is required). After approximately 30s, wildfly will replace this file with `helloworld.isdeploying` and once deployment is successful, wildfly will replace this with `helloworld.deployed` (if successful) or `helloworld.failed` (if unsuccesful). The `.failed` file can be opened with a text editor to see the specific reason for the deployment failure.
 
-### Manually seeding new customer users
+## Extending Skyve
 
-#### Creating the customer scope
+While Skyve attempts to provide as much flexibility as it can to developers out of the box, there are always going to be specific scenarios which require some extra customisation. Because Skyve is an Java Enterprise web application, almost anything which can be done in Java can be added to Skyve.
 
-Here's how to create another customer to the Skyve demo.zip download example, for example a customer called _acme_:
-1.    Copy the _demo_ customer folder from ```\demo\skyve\src\skyve\customers\demo``` to ```\demo\skyve\src\skyve\customers\acme```
-2.    Rename the file ```\demo\skyve\src\skyve\customers\acme\demo.xml``` to ```\demo\skyve\src\skyve\customers\acme\acme.xml```
-3.    Edit the new file ```\demo\skyve\src\skyve\customers\acme\acme.xml``` and change the customer name value to match - i.e. on line 2 ```<customer name="acme" ... ```
+### Consuming 3rd Party APIs
 
-All customisations specific to this customer will live within this customer folder.
+Connecting a Skyve application to a 3rd party web-service is relatively straightforward. There are many libraries available in Java which are able to simplify this process, and there are Skyve production applications consuming REST (JSON + XML) and SOAP web services.
 
-#### Deploying the customer
+An example library to get started with consuming JSON REST endpoints is [Unirest](http://kong.github.io/unirest-java/). This can be added to your project's `pom.xml` by adding the following dependency:
 
-If you're not using a development tool (an IDE like eclipse) and you just want another customer in the demo, then you'll need to copy the customer folder manually to the deployment area, i.e. copy ```\demo\skyve\src\skyve\customers\acme``` to  ```\demo\skyve\javaee\skyve.ear\apps.jar\skyve\customers\acme```
+```xml
+  <dependency>
+    <groupId>com.konghq</groupId>
+    <artifactId>unirest-java</artifactId>
+    <version>3.11.09</version>
+    <classifier>standalone</classifier>
+  </dependency>
+```
 
-If you're using an IDE like eclipse then this copy will happen automatically.
+Contact us on [Slack](https://join.slack.com/t/skyveframework/shared_invite/enQtNDMwNTcyNzE0NzI2LTRkMWUxZDBlZmFlMmJkMjQzYWMzYWQxMmQzYWQ1ZTdlODNkNjRlYzVhYjFmMmQ4NTlhYWY4MjNhMGVkZGNlMjY) if you need more specific examples.
 
-#### Adding a setup user
+### Creating Custom Widgets
 
-However to start creating data within that customer context, you'll need a user credential in the database so that you can log in the first time. There's several ways to do this but the simplest at the moment would be to open up the database and run a script - this will inject a user credential. This is just to get you started. Once you've logged in as this user, you can begin adding more users and data via the user interface.
+While it is possible to add custom controls to the desktop renderer in Skyve, it is more practical to walk through adding a custom widget to the responsive renderer. The following example will walk through creating a custom widget for audio playback.
 
-Now start up the application server, by running _\demo\run.bat_ (or \demo\run.sh if you're not using Windows)
+You will then need to create two Classes (name then what ever you want):
 
-##### Using the h2 database manager
+```java
+  MyCustomComponentBuilderChain extends ComponentBuilderChain
+  MyCustomComponentBuilder extends ResponsiveComponentBuilder
+```
 
-If you're using the demo h2 database, to access the h2 database manager embedded in the demo, browse to ```http://localhost:8080/skyve/h2```
+I would recommend putting them in a “widgets” package in your project src.
 
-![Signing in](/assets/images/h2_database_manager_sign_in.png "Signing in to the embedded h2 database manager")
+`MyCustomComponentBuilderChain` class will look like this:
+```java
+public class MyCustomComponentBuilderChain extends ComponentBuilderChain {
+	public MyCustomComponentBuilderChain() {
+		super(new MyCustomComponentBuilder(), new UnfilterableListGridBuilder(), 
+          new UnsortableListGridBuilder(), new PaginatedListGridBuilder());
+	}
+}
+```
 
-Check that the JDBC URL matches the name of the h2 file in the ```\demo\content\``` folder - for the demo, this will be _demo_ - and so the JDBC URL should have the full path, for example  ```jdbc:h2:C:/demo/skyve/content/demo``` (where ```C:/demo/skyve/content/demo``` is the full path to the file _demo.h2.db_ - without the ".h2.db")
+and the `MyCustomComponentBuilder` class will look like this: 
 
-##### Inserting the user record
+```java
+public class MyCustomComponentBuilder extends ResponsiveComponentBuilder implements Serializable {	
+  private static final String VIDEO_WIDGET_PROPERTY = "videoWidget";	
+  
+  @Override
+	public UIComponent contentLink(UIComponent component, String dataWidgetVar, 
+      ContentLink link, String formDisabledConditionName, String title, boolean required) {
+		if (link.getProperties().containsKey(VIDEO_WIDGET_PROPERTY)) {
+			// Here goes custom code to create and return a <video> widget.
+		}
+    return super.contentLink(component, dataWidgetVar, link, formDisabledConditionName, title, required);
+	}
+}
+```
+(This is a great template to use for building any type of widget.)
 
-NOTE: You will only ever need this script once - to get started - from that point on you won't need to use SQL again to build, test or maintain your application.
+Now go to the `contentLink` for the `edit.xml` where you want the audio player.
+Add the following to your content link where you want your new widget ensure the naming matches that in the `MyCustomComponentBuilder`.
 
-Paste in the following lines into your database manager (modify by replacing _acme_ with your customer name):
+```xml
+  <contentLink binding="contentBinding">
+    <properties>
+      <c:property key="videoWidget">videoWidget</c:property>
+    </properties>
+  </contentLink>
+```
 
- ```
- INSERT INTO adm_contact (bizId,bizVersion,bizLock,bizCustomer,bizUserId,bizKey,name,mobile,email1,contactType) VALUES 
- ('setupContact',72,'20080114123937714setup','acme','setup','Setup User','Setup User',NULL,'info@bizhub.com.au','Person');
+You may need to include the `c` namespace import in your `view` declaration: `xmlns:c="http://www.skyve.org/xml/common"`.
 
-INSERT INTO adm_securitygroup (bizId,bizVersion,bizLock,bizCustomer,bizUserId,bizKey, name,description) VALUES 
- ('setupGroup',200,'20080114123937714setup','acme','setup','Setup','Setup','Setup user');
+In some cases, the property might need to be:
 
-INSERT INTO adm_securitygrouprole (bizId,bizVersion,bizLock,bizCustomer,bizUserId,bizKey, roleName,parent_id) VALUES 
- ('setupGroupRoleBasic',69,'20080114123937714setup','acme','setup','admin.BasicUser','admin.BasicUser','setupGroup'),
- ('setupGroupRoleContact',69,'20080114123937714setup','acme','setup','admin.ContactViewer','admin.ContactViewer','setupGroup'),
- ('setupGroupRoleSecurity',69,'20080114123937714demo','acme','setup','admin.SecurityAdministrator','admin.SecurityAdministrator','setupGroup');
+```xml
+<properties>
+	<ns3:property key="videoWidget">videoWidget</ns3:property>
+</properties>
+```
 
-INSERT INTO adm_securityuser (bizId,bizVersion,bizLock,bizCustomer,bizUserId,bizKey, userName,password,contact_id) VALUES 
- ('setup',57,'20080114123937698setup','acme','setup','setup','setup','0RGzjA5zvIZ8S61AI2BqDg32TC8=','setupContact');
+Finally, in your `edit.xhtml` found in `src/main/webapp/external/edit.xhtml` or the custom renderer if you have one (example given is for the `edit.xhtml`), tell Skyve to use your custom component builder when rendering the view:
 
-INSERT INTO adm_securityuser_groups (owner_id,element_id) VALUES  ('setup','setupGroup');
- ```
- 
- ![Using h2](/assets/images/h2_database_manager.png "Using the h2 database manager")
- 
-NOTE: This script assumes the SHA1 password hashing algorithm. If you're using something else, you'll need to swap the value _'0RGzjA5zvIZ8S61AI2BqDg32TC8='_ for the encrypted value using that algorithm.
+```xml
+  <s:view module="#{skyve.bizModuleParameter}"
+          document="#{skyve.bizDocumentParameter}"
+          managedBean="skyve"
+          componentBuilderClass="widgets.MyCustomComponentBuilderChain"
+          update="@form" />
+```
 
-The above script can be trivially modified if you're using an RDBMS other than h2.
+Now back in the `MyCustomComponentBuilder`, we will add the following code to create the audio playback:
 
-Run the script, then browse to the application at ```localhost:8080\skyve```
+```java
+  if (link.getProperties().containsKey(VIDEO_WIDGET_PROPERTY)) {
+    HtmlPanelGrid result = (HtmlPanelGrid) a.createComponent(HtmlPanelGrid.COMPONENT_TYPE);
+    setId(result, null);
+    result.setColumns(5);
+    String id = result.getId();
+    List<UIComponent> toAddTo = result.getChildren();
 
-Now you can log in as the setup user in the new customer _acme_ - with the following credentials:
+    String binding = link.getBinding();
+    String sanitisedBinding = BindUtil.sanitiseBinding(binding);
 
-- Customer _acme_
-- Username _setup_
-- Password _password01_
-
-![Customer sign in](/assets/images/skyve_customer_sign_in.png "Skyve customer sign in")
+    Media m = (Meadia) a.createComponent(Media.COMPONENT_TYPE);
+    String expression = String.format("#{%s.getContentUrl('%s', false)}", managedBeanName, sanitisedBinding);
+    m.setValueExpression("value", ef.createValueExpression(elc, expression, String.class));
+    m.setid(String.format("%s_%s_player", id, sanitisedBinding));
+    m.setPlayer("quicktime");
+    toAddTo.add(m);
+    return result;
+  }
+```
 
 **[⬆ back to top](#contents)**
