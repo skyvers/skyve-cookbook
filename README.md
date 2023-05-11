@@ -238,7 +238,7 @@ The SessionFilter will allow you to interact with the end points while you have 
 For example:
 
 ```
-http://localhost:8080/<projectName>/rest/json/admin/Contact
+http://localhost:8080/<projectName>/rest/api/json/admin/Contact
 ```
 
 This end point will return an array of json strings for all user contacts. Note that the address includes
@@ -271,7 +271,7 @@ In the example above, there is only one Contact in the database, called admin. T
 To retrieve a specific instance, use the bizId of the instance in the address, for example:
 
 ```
-http://localhost:8080/<projectName>/rest/json/admin/Contact/58619c0d-496b-49e6-9fcb-ff43281ae740
+http://localhost:8080/<projectName>/rest/api/json/admin/Contact/58619c0d-496b-49e6-9fcb-ff43281ae740
 ```
 
 Note that the id matches the bizId in the prior example, and that the entire Contact object is now retrieved - not only the fields in the default query. This includes the result of conditions declared in the Contact document.
@@ -299,21 +299,21 @@ Note the attributes, bizCustomer, bizModule and bizDocument define the specific 
 To retrieve data from a specific query, provide the query name, for example:
 
 ```
-http://localhost:8080/<projectName>/rest/json/query/admin/qContacts/
+http://localhost:8080/<projectName>/rest/api/json/query/admin/qContacts/
 ```
 
 To retrieve a paged result set, provide the start and end rows and the specific Skyve query name, for example to retrieve results 0 to 9:
 
 ```
-http://localhost:8080/siteStorage/rest/json/query/admin/qContacts?start=0&end=9
+http://localhost:8080/siteStorage/rest/api/json/query/admin/qContacts?start=0&end=9
 ```
 
 There are also endpoints provide for insert, update and delete. 
 
 ```
-http://localhost:8080/<projectName>/rest/json/insert/
-http://localhost:8080/<projectName>/rest/json/update/
-http://localhost:8080/<projectName>/rest/json/delete/
+http://localhost:8080/<projectName>/rest/api/json/insert/
+http://localhost:8080/<projectName>/rest/api/json/update/
+http://localhost:8080/<projectName>/rest/api/json/delete/
 ```
 
 These require a complete json representation of the object to be manipulated. These endpoints utilise the bizCustomer, bizModule and bizDocument within the json representation.
@@ -321,7 +321,7 @@ These require a complete json representation of the object to be manipulated. Th
 For example, the update the email address of the contact `admin` in the prior example from `aaliyah.bowling@whosin.com` to `aaliyah.bowling@skyve.org`, supply the modified json as follows:
 
 ```bash
-curl -X POST -H "Content-Type: application/json" -d '{"bizModule":"admin","bizDocument":"Contact","name":"Aaliyah Bowling","contactType":"Person","email1":"aaliyah.bowling@skyve.org","mobile":"0474 618 810","image":"","bizId":"58619c0d-496b-49e6-9fcb-ff43281ae740","bizCustomer":"demo","bizDataGroupId":null,"bizUserId":"bf8cb7c4-5d8a-477b-8b96-15a2bc72364a","bizVersion":5,"bizLock":"20170410143341392demo"}' http://localhost:8080/<projectName>/rest/json/update/
+curl -X POST -H "Content-Type: application/json" -d '{"bizModule":"admin","bizDocument":"Contact","name":"Aaliyah Bowling","contactType":"Person","email1":"aaliyah.bowling@skyve.org","mobile":"0474 618 810","image":"","bizId":"58619c0d-496b-49e6-9fcb-ff43281ae740","bizCustomer":"demo","bizDataGroupId":null,"bizUserId":"bf8cb7c4-5d8a-477b-8b96-15a2bc72364a","bizVersion":5,"bizLock":"20170410143341392demo"}' http://localhost:8080/<projectName>/rest/api/json/update/
 ```
 _Note: on Windows, you will need to use double quotes instead of single quotes around the JSON, and escape the double quotes with a backslash, e.g. "{\"created\":true. This can also be performed as a GET request if the JSON is properly escaped._
 
@@ -366,7 +366,7 @@ The realm is used when an unauthorised response is sent (it is an arbitrary valu
 
 ### Example (CURL)
 ```bash
-curl --user name:password http://192.168.43.91:8080/<projectName>/rest/json/query/admin/qContacts
+curl --user name:password http://192.168.43.91:8080/<projectName>/rest/api/json/query/admin/qContacts
 ```
 
 ### Example (React)
@@ -375,7 +375,7 @@ const base64 = require('base-64');
 var headers = new Headers();
 headers.append("Authorization", "Basic " + base64.encode("admin:password01"));
 console.log(headers);
-fetch('http://192.168.43.91:8080/<projectName>/rest/json/query/admin/qContacts', {
+fetch('http://192.168.43.91:8080/<projectName>/rest/api/json/query/admin/qContacts', {
   headers: headers
 })
 .then((response) => {
