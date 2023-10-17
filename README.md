@@ -12,6 +12,7 @@ Examples and code samples for using the [Skyve](http://skyve.org/) framework.
 * [Understanding Skyve Rest](#understanding-skyve-rest)
 * [Injecting Custom JavaScript into SmartClient](#injecting-custom-javascript-into-smartclient)
 * [Adding Swagger Documentation to your REST API](#adding-swagger-documentation-to-your-rest-api)
+* [Adding Custom Help Documentation to your Skyve application](#adding-custom-help-documentation-to-your-skyve-application)
 * [Customer Scoped Roles](#customer-scoped-roles)
 * [SAIL Automated UI Tests](#sail-automated-ui-tests)
 * [Setting up a Skyve instance](#setting-up-a-skyve-instance)
@@ -711,6 +712,114 @@ In your `maven-war-plugin` `<plugin>` configuration, add the following `webResou
 
 ### Other Resources
 https://stackoverflow.com/questions/3513773/change-mysql-default-character-set-to-utf-8-in-my-cnf
+
+**[⬆ back to top](#contents)**
+
+## Adding Custom Help Documentation to your Skyve Application
+
+Depending on the complexity of your Skyve application, you may require support documentation or a user guide built into the app. This can of course be hosted externally, but this guide will explain one way to include documentation as part of your application so that it is under source control and documentation is in sync with your application version.
+
+## Using Docsify
+There are many ways to provide this functionality, this guide is merely one example, but the steps listed here should be adaptable to other documentation platforms. [Docsify](https://docsify.js.org/#/) is a JavaScript library that fetches markdown files from your application server and renders them as HTML at runtime. This allows help documentation to be written within your IDE in Markdown, but provides a rich and pleasant experience to the end users. An alternative is [Docute](http://docute.egoist.dev), but that is no longer actively maintained.
+
+The default Skyve Content Security Policy will prevent the loading of CSS and JS from external websites unless they are whitelisted, so we will need to modify the CSP to whitelist the CDN they are served from.
+
+In `src/main/webapp/WEB-INF/web.xml`:
+1. Update the `script-src` directive to end with the jsdelivr domain before the semicolon:
+```
+script-src ... https://cdn.jsdelivr.net;
+```
+2. Update the `style-src` directive to end with the jsdelivr domain before the semicolon:
+```
+style-src ... https://cdn.jsdelivr.net;
+```
+
+These files can be downloaded and stored locally once everything is working so that the CSP can be reverted to the Skyve default.
+
+Next, we will use the `DocsServlet` that can also be used to [serve Swagger documentation](#adding-swagger-documentation-to-your-rest-api) to route to the Docsify index page. The DocsServlet requires that users be authenticated with Skyve, your help pages will not be public.
+
+In `src/main/webapp/WEB-INF/web.xml`:
+1. Uncomment the `DocsServlet` and change the docsPath to be inside a `docs` folder and point to an `xhtml` page we will use to load Docsify
+```xml
+	<servlet>
+		<servlet-name>DocsServlet</servlet-name>
+		<servlet-class>org.skyve.impl.web.service.DocsServlet</servlet-class>
+		<init-param>
+			<param-name>docsPath</param-name>
+			<param-value>/docs/guide.xhtml</param-value>
+		</init-param>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>DocsServlet</servlet-name>
+		<url-pattern>/docs</url-pattern>
+	</servlet-mapping>
+```
+
+Next we need to create a guide.xhtml inside a docs folder:
+
+1. In `src/main/webapp`, create a folder called `docs`
+2. Inside the new `docs` folder, create a file called `guide.xhtml` (or the name you gave it in the servlet definition in the `web.xml`) 
+3. Use this guide.xhtml as a starting point, update the `<title>` as appropriate:
+```html
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" 
+		xmlns:ui="http://java.sun.com/jsf/facelets" 
+		xmlns:h="http://java.sun.com/jsf/html" 
+		xmlns:f="http://java.sun.com/jsf/core"
+		dir="#{skyve.dir}">
+<f:view contentType="text/html" encoding="UTF-8">
+	<head>
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+    	<meta name="viewport" content="width=device-width,initial-scale=1" />
+    	<meta charset="UTF-8" />
+		<title>User Guide</title>
+		<ui:include src="/WEB-INF/pages/includes/favicon.xhtml" />
+		<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/docsify@4/themes/vue.css" />
+	</head>
+	<body>
+		<noscript>We're sorry, but the documentation doesn't work properly without JavaScript enabled. Please enable it to continue.</noscript>
+		<div id="app">Loading, please wait...</div>
+		
+		<script src="https://cdn.jsdelivr.net/npm/docsify@4"></script>
+		<script>
+			window.$docsify = {
+				loadSidebar: true,
+				subMaxLevel: 2
+			};
+	    </script>
+	</body>
+</f:view>
+</html>
+```
+
+By default, Docsify will load a file exactly called README.md (case-sensitive) inside the `docs` folder. This file should be written in Markdown, and will be converted to HTML by Docsify, e.g.:
+
+```md
+# My User Guide 
+
+## Introduction
+
+This user guide provides information on how to use this Skyve application.
+
+## Enquiries
+
+In the first instance, enquiries relating to the content of this document should be directed to me.
+```
+
+## Writing additional pages
+Additional pages can be placed inside the docs folder, or nested subdirectories inside docs. You will need to create a sidebar to name and tell Docsify where these files are.
+
+1. Create a _sidebar.md inside docs
+2. Specify the routes to the pages, these can be at the top level or nested under headings, like below:
+
+```md
+* Getting Started
+    * [Home](/)
+* Another Level
+    * [Using this app](using-this-app.md)
+```
+
+For additional customisation on the sidebar, or theming Docsify, please see [their documentation](https://docsify.js.org/#/).
 
 **[⬆ back to top](#contents)**
 
